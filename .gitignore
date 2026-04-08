@@ -3,3 +3,5 @@
 vault/data/
 softhsm/tokens/
 vault-init.json
+vault-hsm-init.json
+vault-main-init.json
