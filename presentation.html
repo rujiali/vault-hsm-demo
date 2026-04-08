@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vault HSM Integration Demo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #0f0f0f;
+      color: #f0f0f0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .deck {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      padding: 60px 80px;
+      flex-direction: column;
+      justify-content: center;
+      position: absolute;
+      top: 0; left: 0;
+    }
+
+    .slide.active { display: flex; }
+
+    /* Slide themes */
+    .slide-cover {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide-dark { background: #111827; }
+    .slide-accent { background: #0d1b2a; }
+
+    /* Typography */
+    .eyebrow {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #f6c90e;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg, #ffffff, #a8d8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: #ffffff;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f6c90e;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: #94a3b8;
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    p, li {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+
+    ul { list-style: none; padding: 0; }
+
+    ul li::before {
+      content: '→';
+      color: #f6c90e;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    /* Layout components */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 28px;
+      margin-top: 16px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .card-accent {
+      border-color: #f6c90e;
+      background: rgba(246,201,14,0.05);
+    }
+
+    /* Code block */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #e6edf3;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
+    .code-block .comment { color: #8b949e; }
+    .code-block .keyword { color: #ff7b72; }
+    .code-block .string { color: #a5d6ff; }
+    .code-block .highlight { color: #f6c90e; }
+
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 32px 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-box {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 14px 22px;
+      font-size: 0.95rem;
+      text-align: center;
+      min-width: 130px;
+    }
+
+    .flow-box.highlighted {
+      border-color: #f6c90e;
+      background: rgba(246,201,14,0.1);
+      color: #f6c90e;
+      font-weight: 600;
+    }
+
+    .flow-arrow {
+      color: #475569;
+      font-size: 1.4rem;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      background: rgba(246,201,14,0.15);
+      border: 1px solid #f6c90e;
+      color: #f6c90e;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.95rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      background: rgba(246,201,14,0.1);
+      color: #f6c90e;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(246,201,14,0.3);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: #cbd5e1;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      bottom: 32px;
+      right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .nav button {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav button:hover { background: rgba(246,201,14,0.2); border-color: #f6c90e; }
+
+    .slide-counter {
+      font-size: 0.85rem;
+      color: #475569;
+    }
+
+    /* Animated arrows */
+    @keyframes flowDown {
+      0%   { opacity: 0; transform: translateY(-6px); }
+      50%  { opacity: 1; }
+      100% { opacity: 0; transform: translateY(6px); }
+    }
+
+    @keyframes flowRight {
+      0%   { opacity: 0; transform: translateX(-6px); }
+      50%  { opacity: 1; }
+      100% { opacity: 0; transform: translateX(6px); }
+    }
+
+    .arrow-down {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .arrow-down span {
+      display: block;
+      width: 2px;
+      height: 8px;
+      background: #f6c90e;
+      border-radius: 2px;
+      animation: flowDown 1.2s ease-in-out infinite;
+    }
+
+    .arrow-down span:nth-child(1) { animation-delay: 0s; }
+    .arrow-down span:nth-child(2) { animation-delay: 0.2s; }
+    .arrow-down span:nth-child(3) { animation-delay: 0.4s; }
+
+    .arrow-down::after {
+      content: '▼';
+      color: #f6c90e;
+      font-size: 0.9rem;
+    }
+
+    .arrow-right {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .arrow-right span {
+      display: block;
+      width: 8px;
+      height: 2px;
+      background: #475569;
+      border-radius: 2px;
+      animation: flowRight 1.2s ease-in-out infinite;
+    }
+
+    .arrow-right span:nth-child(1) { animation-delay: 0s; }
+    .arrow-right span:nth-child(2) { animation-delay: 0.2s; }
+    .arrow-right span:nth-child(3) { animation-delay: 0.4s; }
+
+    .arrow-right::after {
+      content: '▶';
+      color: #475569;
+      font-size: 0.9rem;
+    }
+
+    /* Progress bar */
+    .progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: #f6c90e;
+      transition: width 0.3s ease;
+      z-index: 100;
+    }
+
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: #f6c90e;
+      margin-bottom: 24px;
+    }
+
+    .icon { font-size: 2.5rem; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck">
+
+  <!-- Slide 1: Cover -->
+  <div class="slide slide-cover active">
+    <div class="eyebrow">HashiCorp Vault</div>
+    <h1>Encryption as a Service<br>& HSM Integration</h1>
+    <p class="subtitle">How to protect sensitive data without ever exposing the key</p>
+  </div>
+
+  <!-- Slide 2: The Problem -->
+  <div class="slide slide-dark">
+    <div class="eyebrow">The Challenge</div>
+    <h2>How do you protect a key<br>without seeing it?</h2>
+    <div class="grid-2">
+      <div>
+        <ul style="margin-top:8px">
+          <li style="margin-bottom:14px">Applications need to encrypt sensitive data</li>
+          <li style="margin-bottom:14px">Keys must never be exposed to applications</li>
+          <li style="margin-bottom:14px">Compliance requires hardware-backed key storage</li>
+          <li style="margin-bottom:14px">Key rotation must not break existing data</li>
+          <li>Separation of duties — who can encrypt vs decrypt</li>
+        </ul>
+      </div>
+      <div class="card card-accent">
+        <h3>The Risk</h3>
+        <p>When applications manage their own keys, keys end up in config files, environment variables, and logs — exposed and unaudited.</p>
+        <br>
+        <p style="color:#f6c90e">The application should never see the key.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Solution Overview -->
+  <div class="slide slide-accent">
+    <div class="eyebrow">The Solution</div>
+    <h2>How Encryption as a Service Works</h2>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items:center; margin-top:16px">
+
+      <!-- Left: step by step -->
+      <div>
+        <div style="display:flex; flex-direction:column; gap:16px">
+
+          <div style="display:flex; align-items:flex-start; gap:16px">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:#f6c90e; color:#000; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.85rem">1</div>
+            <div>
+              <p style="color:#fff; font-weight:600">App sends plaintext to Vault API</p>
+              <p style="color:#64748b; font-size:0.9rem">e.g. a personnel record or credential</p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:16px">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:#f6c90e; color:#000; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.85rem">2</div>
+            <div>
+              <p style="color:#fff; font-weight:600">Vault requests key from HSM via PKCS#11</p>
+              <p style="color:#64748b; font-size:0.9rem">Key is unwrapped inside HSM hardware — never exported</p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:16px">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:#f6c90e; color:#000; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.85rem">3</div>
+            <div>
+              <p style="color:#fff; font-weight:600">Vault encrypts the data internally</p>
+              <p style="color:#64748b; font-size:0.9rem">Encryption happens inside Vault memory using the HSM-backed key</p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:16px">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:#f6c90e; color:#000; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.85rem">4</div>
+            <div>
+              <p style="color:#fff; font-weight:600">Vault returns ciphertext to the app</p>
+              <p style="color:#64748b; font-size:0.9rem">App stores ciphertext — never the key, never the plaintext</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: visual diagram -->
+      <div style="display:flex; flex-direction:column; align-items:flex-start; gap:8px">
+
+        <!-- Row 1: App sends -->
+        <div style="display:flex; align-items:center">
+          <div style="width:200px; display:flex; justify-content:center">
+            <div class="flow-box" style="width:200px; text-align:center; padding:16px;">
+              🖥️ Application<br><small style="color:#64748b">sends plaintext</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow down (animated) -->
+        <div style="width:200px; display:flex; justify-content:center;">
+          <div class="arrow-down">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <!-- Row 2: Vault → HSM (same row) -->
+        <div style="display:flex; align-items:center; gap:12px">
+          <div class="flow-box highlighted" style="width:200px; text-align:center; padding:16px;">
+            🏛️ Vault Transit<br><small>encrypts internally</small>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px">
+            <div style="color:#475569; font-size:0.7rem">PKCS#11</div>
+            <div class="arrow-right">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="flow-box" style="width:180px; text-align:center; padding:16px;">
+            🔒 HSM<br><small style="color:#64748b">key lives here</small>
+          </div>
+        </div>
+
+        <!-- Arrow down (animated) -->
+        <div style="width:200px; display:flex; justify-content:center;">
+          <div class="arrow-down">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <!-- Row 3: App receives -->
+        <div style="display:flex; align-items:center">
+          <div style="width:200px; display:flex; justify-content:center">
+            <div class="flow-box" style="width:200px; text-align:center; padding:16px;">
+              🖥️ Application<br><small style="color:#64748b">receives ciphertext</small>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px; padding:10px 20px; border:1px solid #f6c90e; border-radius:6px; color:#f6c90e; font-size:0.85rem; text-align:center">
+          Key never leaves HSM
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: How Keys Are Protected -->
+  <div class="slide slide-dark">
+    <div class="eyebrow">Key Protection</div>
+    <h2>Where Does the Encryption Key Live?</h2>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:48px; align-items:center; margin-top:16px">
+
+      <!-- Left: explanation -->
+      <div style="display:flex; flex-direction:column; gap:20px">
+        <div class="card">
+          <h3>Transit Key (AES-256)</h3>
+          <p>Lives in Vault's storage — but stored as <strong style="color:#f6c90e">ciphertext</strong>. Without the HSM, it is unreadable.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>HSM Master Key</h3>
+          <p>Lives inside the HSM hardware — <strong style="color:#f6c90e">never exported</strong>. Used to wrap and unwrap the Transit key on demand.</p>
+        </div>
+        <div class="card">
+          <h3>The Result</h3>
+          <p>Even if someone steals Vault's storage, they get encrypted keys they cannot unwrap — the HSM hardware is the only way to use them.</p>
+        </div>
+      </div>
+
+      <!-- Right: visual chain -->
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px">
+
+        <div class="flow-box" style="width:220px; text-align:center; padding:16px; border-color:#f6c90e; background:rgba(246,201,14,0.05)">
+          🔒 HSM<br><small style="color:#64748b">holds master key — never leaves hardware</small>
+        </div>
+
+        <div style="display:flex; flex-direction:column; align-items:center; gap:2px">
+          <div style="color:#475569; font-size:0.75rem">wraps / unwraps on demand</div>
+          <div class="arrow-down"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="flow-box highlighted" style="width:220px; text-align:center; padding:16px;">
+          🏛️ Vault Storage<br><small>Transit key — encrypted at rest</small>
+        </div>
+
+        <div style="display:flex; flex-direction:column; align-items:center; gap:2px">
+          <div style="color:#475569; font-size:0.75rem">temporarily unwrapped in memory</div>
+          <div class="arrow-down"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="flow-box" style="width:220px; text-align:center; padding:16px;">
+          🖥️ Your Data<br><small style="color:#64748b">encrypted / decrypted</small>
+        </div>
+
+        <div style="margin-top:8px; padding:10px 20px; border:1px solid #f6c90e; border-radius:6px; color:#f6c90e; font-size:0.85rem; text-align:center">
+          Stealing Vault storage alone is useless
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Vault Transit Engine -->
+  <div class="slide slide-dark">
+    <div class="eyebrow">Vault Transit Engine</div>
+    <h2>Encryption as a Service</h2>
+    <div class="grid-2">
+      <div>
+        <ul>
+          <li style="margin-bottom:14px">Applications encrypt/decrypt via Vault API</li>
+          <li style="margin-bottom:14px">Encryption keys managed entirely by Vault</li>
+          <li style="margin-bottom:14px">Keys never exported or exposed</li>
+          <li style="margin-bottom:14px">Built-in key versioning and rotation</li>
+          <li>Full audit log of every operation</li>
+        </ul>
+      </div>
+      <div class="code-block">
+        <span class="comment"># Encrypt sensitive data</span><br>
+        vault write transit/encrypt/demo-key \<br>
+        &nbsp;&nbsp;plaintext=$(base64 &lt;&lt;&lt; "personnel record")<br><br>
+        <span class="comment"># Returns ciphertext only</span><br>
+        <span class="highlight">vault:v1:ABC123xyz...</span><br><br>
+        <span class="comment"># Application never sees the key</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: HSM Integration -->
+  <div class="slide slide-accent">
+    <div class="eyebrow">HSM Integration</div>
+    <h2>Hardware Root of Trust</h2>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon">🔐</div>
+        <h3>PKCS#11</h3>
+        <p>Industry standard protocol. Vault connects to HSM via PKCS#11 — same code path works with any certified HSM vendor.</p>
+      </div>
+      <div class="card card-accent">
+        <div class="icon">🏛️</div>
+        <h3>Auto-Unseal</h3>
+        <p>Vault uses the HSM to unseal automatically on restart. No human operator needed. Master key never exists in software.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🛡️</div>
+        <h3>Seal Wrap</h3>
+        <p>Every sensitive value in Vault storage is wrapped by the HSM master key. Storage is useless without the HSM.</p>
+      </div>
+    </div>
+    <div style="margin-top:32px">
+      <table>
+        <tr>
+          <th>Environment</th>
+          <th>HSM</th>
+          <th>Protocol</th>
+        </tr>
+        <tr>
+          <td>Demo</td>
+          <td>SoftHSM (software simulated)</td>
+          <td>PKCS#11</td>
+        </tr>
+        <tr>
+          <td>Production</td>
+          <td>Thales / Entrust / CloudHSM</td>
+          <td>PKCS#11</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Slide 6: Key Rotation -->
+  <div class="slide slide-dark">
+    <div class="eyebrow">Key Lifecycle</div>
+    <h2>Key Rotation Without Breaking Data</h2>
+    <div class="grid-2">
+      <div>
+        <ul>
+          <li style="margin-bottom:14px">Keys are versioned — rotation creates a new version</li>
+          <li style="margin-bottom:14px">New encryptions use the latest key version</li>
+          <li style="margin-bottom:14px">Old ciphertext remains decryptable — no re-encryption required</li>
+          <li style="margin-bottom:14px">Minimum decryption version can be set to retire old keys</li>
+          <li>Zero application downtime during rotation</li>
+        </ul>
+      </div>
+      <div class="code-block">
+        <span class="comment"># Rotate the key</span><br>
+        vault write -f transit/keys/demo-key/rotate<br><br>
+        <span class="comment"># New ciphertext uses v2</span><br>
+        <span class="highlight">vault:v2:XYZ789abc...</span><br><br>
+        <span class="comment"># Old v1 ciphertext still works</span><br>
+        <span class="highlight">vault:v1:ABC123xyz...</span> ✓
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: Key Rotation Explained -->
+  <div class="slide slide-dark">
+    <div class="eyebrow">Key Rotation</div>
+    <h2>How Apps Keep Working After Rotation</h2>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:48px; align-items:start; margin-top:16px">
+
+      <!-- Left: explanation -->
+      <div style="display:flex; flex-direction:column; gap:16px">
+
+        <div class="card">
+          <h3>Rotation is Additive</h3>
+          <p>A new key version is created — old versions are <strong style="color:#f6c90e">kept</strong>, not deleted. Vault maintains all versions until explicitly retired.</p>
+        </div>
+
+        <div class="card">
+          <h3>Ciphertext is Self-Describing</h3>
+          <p>The key version is embedded in every ciphertext token. Vault reads it automatically and uses the correct version to decrypt.</p>
+          <div class="code-block" style="margin-top:12px; font-size:0.82rem">
+            <span class="highlight">vault:v1:</span>ABC123...&nbsp;&nbsp;<span class="comment">← uses v1</span><br>
+            <span class="highlight">vault:v2:</span>XYZ789...&nbsp;&nbsp;<span class="comment">← uses v2</span>
+          </div>
+        </div>
+
+        <div class="card card-accent">
+          <h3>Zero App Changes</h3>
+          <p>Apps send ciphertext to Vault — Vault selects the right key version transparently. No code change. No downtime.</p>
+        </div>
+
+      </div>
+
+      <!-- Right: before/after flow -->
+      <div style="display:flex; flex-direction:column; gap:24px">
+
+        <!-- Before rotation -->
+        <div>
+          <div style="color:#475569; font-size:0.8rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.1em">Before Rotation</div>
+          <div style="display:flex; align-items:center; gap:8px">
+            <div class="flow-box" style="width:120px; text-align:center; font-size:0.85rem">App<br><small style="color:#64748b">vault:v1:ABC</small></div>
+            <div class="arrow-right"><span></span><span></span><span></span></div>
+            <div class="flow-box highlighted" style="width:140px; text-align:center; font-size:0.85rem">Vault<br><small>decrypts with v1</small></div>
+            <div style="color:#4ade80; font-size:1.2rem">✓</div>
+          </div>
+        </div>
+
+        <!-- After rotation -->
+        <div>
+          <div style="color:#475569; font-size:0.8rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.1em">After Rotation</div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; align-items:center; gap:8px">
+              <div class="flow-box" style="width:120px; text-align:center; font-size:0.85rem">App<br><small style="color:#64748b">vault:v1:ABC</small></div>
+              <div class="arrow-right"><span></span><span></span><span></span></div>
+              <div class="flow-box highlighted" style="width:140px; text-align:center; font-size:0.85rem">Vault<br><small>decrypts with v1</small></div>
+              <div style="color:#4ade80; font-size:1.2rem">✓</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <div class="flow-box" style="width:120px; text-align:center; font-size:0.85rem">App<br><small style="color:#64748b">vault:v2:XYZ</small></div>
+              <div class="arrow-right"><span></span><span></span><span></span></div>
+              <div class="flow-box highlighted" style="width:140px; text-align:center; font-size:0.85rem">Vault<br><small>decrypts with v2</small></div>
+              <div style="color:#4ade80; font-size:1.2rem">✓</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Optional enforcement -->
+        <div class="card" style="margin-top:4px">
+          <h3>Optional — Retire Old Versions</h3>
+          <p style="font-size:0.9rem">Set a minimum decryption version to force re-encryption of old data. A deliberate compliance decision — not automatic.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Separation of Duties -->
+  <div class="slide slide-accent">
+    <div class="eyebrow">Access Control</div>
+    <h2>Separation of Duties</h2>
+    <p style="margin-bottom:28px; color:#94a3b8">Different teams get different capabilities — enforced by Vault policy, not application logic.</p>
+    <div class="grid-3">
+      <div class="card">
+        <h3>Encrypt Only</h3>
+        <p>Application can submit plaintext and receive ciphertext.</p>
+        <br>
+        <p style="color:#475569; font-size:0.85rem">Cannot decrypt. Cannot manage keys.</p>
+      </div>
+      <div class="card">
+        <h3>Decrypt Only</h3>
+        <p>Authorised service can decrypt ciphertext to retrieve data.</p>
+        <br>
+        <p style="color:#475569; font-size:0.85rem">Cannot encrypt. Cannot manage keys.</p>
+      </div>
+      <div class="card card-accent">
+        <h3>Key Admin</h3>
+        <p>Security team can rotate and manage keys.</p>
+        <br>
+        <p style="color:#475569; font-size:0.85rem">Cannot encrypt or decrypt data.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: Compliance - Business Language -->
+  <div class="slide slide-accent">
+    <div class="eyebrow">Why This Matters</div>
+    <h2>Meeting Your Compliance Obligations</h2>
+    <div class="grid-2" style="margin-top:16px">
+
+      <div style="display:flex; flex-direction:column; gap:20px">
+        <div class="card card-accent">
+          <h3>🔐 Keys Protected by Certified Hardware</h3>
+          <p>Encryption keys are stored and protected inside a Hardware Security Module — the industry standard for organisations that cannot afford key compromise.</p>
+        </div>
+        <div class="card">
+          <h3>📋 Complete Audit Trail</h3>
+          <p>Every encryption and decryption operation is logged with identity, timestamp and context. You can prove who accessed what data, and when.</p>
+        </div>
+        <div class="card">
+          <h3>🔄 Keys Rotate Without Business Disruption</h3>
+          <p>Encryption keys can be rotated on demand — existing data remains accessible, new data uses the latest key. No downtime, no re-engineering.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:20px">
+        <div class="card">
+          <h3>👥 No Single Person Holds All the Power</h3>
+          <p>The team that encrypts data cannot decrypt it. The team that manages keys cannot read the data. Separation of duties enforced by policy, not trust.</p>
+        </div>
+        <div class="card">
+          <h3>🚀 Ready for Post-Quantum Requirements</h3>
+          <p>Australian government agencies must migrate to post-quantum cryptography by 2030. Vault's algorithm agility means you can migrate without re-architecting.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>📄 Aligned to Australian ISM</h3>
+          <p>Controls map directly to ISM requirements for cryptographic key management, data encryption, hardware key protection and post-quantum readiness.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Slide 10: Demo Flow -->
+  <div class="slide slide-accent">
+    <div class="eyebrow">Demo</div>
+    <h2>What You Will See</h2>
+    <div class="grid-2">
+      <div>
+        <div style="margin-bottom:24px">
+          <div class="badge">Step 1</div>
+          <h3>Encrypt sensitive data</h3>
+          <p>Submit a personnel record → receive ciphertext. The key never leaves the HSM.</p>
+        </div>
+        <div style="margin-bottom:24px">
+          <div class="badge">Step 2</div>
+          <h3>Decrypt ciphertext</h3>
+          <p>Authorised role decrypts the data. Unauthorised role is denied.</p>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom:24px">
+          <div class="badge">Step 3</div>
+          <h3>Rotate the key</h3>
+          <p>Key rotated in Vault. Old ciphertext still decryptable. New encryptions use new version.</p>
+        </div>
+        <div>
+          <div class="badge">Step 4</div>
+          <h3>Separation of duties</h3>
+          <p>Encrypt-only token attempts decryption → permission denied.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: Summary -->
+  <div class="slide slide-cover">
+    <div class="eyebrow">Summary</div>
+    <h1>The Key Never Leaves.<br>The Data Stays Protected.</h1>
+    <p class="subtitle" style="margin-top:8px">Vault Transit + HSM gives you encryption as a service with a hardware root of trust — without the application ever touching a key.</p>
+  </div>
+
+  <!-- Slide 12: ISM Controls Reference -->
+  <div class="slide slide-dark">
+    <div class="eyebrow">Reference — ISM Controls</div>
+    <h2>Mapping to ISM Controls</h2>
+    <table style="margin-top:8px; font-size:0.88rem">
+      <tr>
+        <th style="width:15%">ISM Control</th>
+        <th style="width:30%">Topic</th>
+        <th style="width:55%">How Vault Addresses It</th>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-0507</td>
+        <td>Cryptographic Key Management</td>
+        <td>Vault Transit manages full key lifecycle — creation, rotation, versioning and retirement</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-1080</td>
+        <td>Encrypting Data at Rest</td>
+        <td>Vault Transit uses ASD-Approved Cryptographic Algorithm (AES-256) for encryption</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-1769</td>
+        <td>Using Symmetric Cryptographic Algorithms</td>
+        <td>Vault Transit encrypts using AES-256 — preferred algorithm per ISM</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-0471</td>
+        <td>Using ASD-Approved Cryptographic Algorithms</td>
+        <td>Vault only uses AACAs — AES-256 for data encryption, SHA-256 for HMAC</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-1402</td>
+        <td>Protecting Credentials</td>
+        <td>Credentials and keys protected by HSM — hardware security module integration via PKCS#11</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-1324</td>
+        <td>Generating Certificates</td>
+        <td>Vault PKI engine generates certificates using HSM-backed keys</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-2073</td>
+        <td>Post-Quantum Cryptography Transition</td>
+        <td>Vault's key agility supports algorithm migration — swap algorithms without re-architecting</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-1917</td>
+        <td>Post-Quantum Readiness by 2030</td>
+        <td>Vault Transit supports ML-KEM-1024 and AES-256 — aligns with 2030 PQC requirements</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prev()">← Prev</button>
+  <span class="slide-counter" id="counter">1 / 10</span>
+  <button onclick="next()">Next →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function show(n, updateHash = true) {
+    slides[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('progress').style.width = `${((current + 1) / total) * 100}%`;
+    if (updateHash) history.replaceState(null, null, `#slide-${current + 1}`);
+  }
+
+  function next() { show(current + 1); }
+  function prev() { show(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev();
+  });
+
+  // Load slide from URL hash on page load
+  const hash = window.location.hash;
+  if (hash) {
+    const match = hash.match(/^#slide-(\d+)$/);
+    if (match) {
+      const n = parseInt(match[1], 10) - 1;
+      if (n >= 0 && n < total) show(n, false);
+    }
+  } else {
+    document.getElementById('progress').style.width = `${(1 / total) * 100}%`;
+  }
+</script>
+
+</body>
+</html>

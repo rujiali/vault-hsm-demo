@@ -1,0 +1,40 @@
+services:
+
+  softhsm:
+    build:
+      context: ./softhsm
+    container_name: softhsm
+    volumes:
+      - softhsm-tokens:/var/lib/softhsm/tokens
+      - pkcs11-socket:/var/run/pkcs11
+    networks:
+      - vault-net
+
+  vault:
+    image: hashicorp/vault-enterprise:latest
+    container_name: vault
+    depends_on:
+      - softhsm
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_LICENSE: ${VAULT_LICENSE}
+      VAULT_ADDR: http://0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./config/vault.hcl:/vault/config/vault.hcl
+      - vault-data:/vault/data
+      - pkcs11-socket:/var/run/pkcs11
+    command: vault server -config=/vault/config/vault.hcl
+    networks:
+      - vault-net
+
+volumes:
+  softhsm-tokens:
+  vault-data:
+  pkcs11-socket:
+
+networks:
+  vault-net:
+    driver: bridge

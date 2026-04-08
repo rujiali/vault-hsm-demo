@@ -1,0 +1,5 @@
+.env
+*.log
+vault/data/
+softhsm/tokens/
+vault-init.json
