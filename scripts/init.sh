@@ -7,12 +7,12 @@ export VAULT_ADDR=http://localhost:8200
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo "==> Waiting for vault-main to be ready..."
-until curl -sf $VAULT_ADDR/v1/sys/health > /dev/null 2>&1; do
+until curl -s $VAULT_ADDR/v1/sys/health 2>/dev/null | python3 -c "import sys,json; json.load(sys.stdin)" > /dev/null 2>&1; do
   sleep 2
 done
 
 echo "==> Initialising vault-main..."
-INIT_OUTPUT=$(vault operator init -key-shares=1 -key-threshold=1 -format=json)
+INIT_OUTPUT=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format=json)
 ROOT_TOKEN=$(echo "$INIT_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['root_token'])")
 echo "$INIT_OUTPUT" > "$SCRIPT_DIR/vault-main-init.json"
 echo "    Init complete. Keys saved to vault-main-init.json (gitignored)"

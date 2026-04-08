@@ -9,17 +9,27 @@ SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 ENV_FILE="$SCRIPT_DIR/.env"
 
 echo "==> Waiting for vault-hsm to be ready..."
-until curl -sf $VAULT_ADDR/v1/sys/health > /dev/null 2>&1; do
+until curl -s $VAULT_ADDR/v1/sys/health 2>/dev/null | python3 -c "import sys,json; json.load(sys.stdin)" > /dev/null 2>&1; do
   sleep 2
 done
 
-# ---- Initialise vault-hsm (standard Shamir — it's not using a seal) ----
-echo "==> Initialising vault-hsm..."
-INIT_OUTPUT=$(vault operator init -key-shares=1 -key-threshold=1 -format=json)
+INIT_FILE="$SCRIPT_DIR/vault-hsm-init.json"
+
+# ---- Initialise or unseal vault-hsm ----
+INITIALIZED=$(curl -s $VAULT_ADDR/v1/sys/health | python3 -c "import sys,json; s=json.load(sys.stdin); print('true' if s.get('initialized') else 'false')")
+
+if [ "$INITIALIZED" = "false" ]; then
+  echo "==> Initialising vault-hsm..."
+  INIT_OUTPUT=$(vault operator init -key-shares=1 -key-threshold=1 -format=json)
+  echo "$INIT_OUTPUT" > "$INIT_FILE"
+  echo "    Init complete. Keys saved to vault-hsm-init.json (gitignored)"
+else
+  echo "==> vault-hsm already initialised — loading saved keys from $INIT_FILE"
+  INIT_OUTPUT=$(cat "$INIT_FILE")
+fi
+
 UNSEAL_KEY=$(echo "$INIT_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['unseal_keys_b64'][0])")
 HSM_ROOT_TOKEN=$(echo "$INIT_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['root_token'])")
-echo "$INIT_OUTPUT" > "$SCRIPT_DIR/vault-hsm-init.json"
-echo "    Init complete. Keys saved to vault-hsm-init.json (gitignored)"
 
 echo "==> Unsealing vault-hsm..."
 vault operator unseal "$UNSEAL_KEY"
@@ -27,15 +37,16 @@ sleep 1
 
 export VAULT_TOKEN=$HSM_ROOT_TOKEN
 
-echo "==> Enabling Transit secrets engine on vault-hsm..."
-vault secrets enable transit
+# Only configure Transit if this is a fresh init
+if [ "$INITIALIZED" = "false" ]; then
+  echo "==> Enabling Transit secrets engine on vault-hsm..."
+  vault secrets enable transit
 
-echo "==> Creating autounseal key..."
-vault write -f transit/keys/autounseal-key \
-  type=aes256-gcm96
+  echo "==> Creating autounseal key..."
+  vault write -f transit/keys/autounseal-key
 
-echo "==> Creating policy for vault-main auto-unseal..."
-vault policy write autounseal-policy - <<'EOF'
+  echo "==> Creating policy for vault-main auto-unseal..."
+  vault policy write autounseal-policy - <<'EOF'
 path "transit/encrypt/autounseal-key" {
   capabilities = ["update"]
 }
@@ -43,6 +54,7 @@ path "transit/decrypt/autounseal-key" {
   capabilities = ["update"]
 }
 EOF
+fi
 
 echo "==> Creating scoped token for vault-main..."
 AUTOUNSEAL_TOKEN=$(vault token create \

@@ -1,21 +1,23 @@
 # Vault HSM Demo
 
-Demonstrates **Encryption as a Service** and **HSM integration** using:
-- HashiCorp Vault Enterprise
-- SoftHSM2 (PKCS#11 simulated HSM)
+Demonstrates **Encryption as a Service** and **HSM integration** using two HashiCorp Vault Enterprise instances:
+
+- `vault-hsm` — acts as the root of trust (mimics an HSM via Vault Transit seal)
+- `vault-main` — auto-unseals via `vault-hsm`, runs the Transit EaaS engine for applications
 
 ## What this demo shows
 
-- Vault auto-unsealing via HSM (PKCS#11)
-- Transit engine for encryption as a service
-- Key never exposed to applications
+- Vault auto-unsealing via Transit seal (HSM pattern — master key never leaves vault-hsm)
+- Transit engine for Encryption as a Service
+- Encryption key never exposed to applications
 - Key rotation with backward compatibility
 - Separation of duties via Vault policies
 
 ## Prerequisites
 
 - Docker + Docker Compose
-- Vault Enterprise license
+- HashiCorp Vault Enterprise license
+- `vault` CLI installed locally
 
 ## Setup
 
@@ -24,10 +26,16 @@ Demonstrates **Encryption as a Service** and **HSM integration** using:
 cp .env.example .env
 # Edit .env and set VAULT_LICENSE=<your-license>
 
-# 2. Start the stack
-docker-compose up -d
+# 2. Start vault-hsm
+docker compose up -d vault-hsm
 
-# 3. Initialise Vault
+# 3. Bootstrap vault-hsm (init, unseal, create Transit key, write token to .env)
+./scripts/init-hsm.sh
+
+# 4. Start vault-main (picks up VAULT_HSM_TOKEN from .env)
+docker compose up -d vault-main
+
+# 5. Initialise vault-main (auto-unseals via vault-hsm Transit seal)
 ./scripts/init.sh
 ```
 
@@ -40,9 +48,13 @@ docker-compose up -d
 ## Architecture
 
 ```
-App → Vault Transit (Encryption as a Service)
-              ↓
-         PKCS#11
-              ↓
-          SoftHSM (master key lives here, never exported)
+App → vault-main (Transit EaaS)
+              ↓  Transit seal
+         vault-hsm (root of trust)
+         master key lives here, never exported
 ```
+
+| Instance  | Port | Role |
+|-----------|------|------|
+| vault-hsm  | 8201 | HSM mimic — holds master key via Transit seal |
+| vault-main | 8200 | Application-facing — Encryption as a Service |

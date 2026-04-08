@@ -14,7 +14,7 @@ listener "tcp" {
 # VAULT_TRANSIT_SEAL_TOKEN env var supplies the token at runtime
 seal "transit" {
   address         = "http://vault-hsm:8200"
-  # token supplied via VAULT_TRANSIT_SEAL_TOKEN environment variable
+  # token supplied via VAULT_TOKEN environment variable
   mount_path      = "transit"
   key_name        = "autounseal-key"
   tls_skip_verify = true

@@ -3,6 +3,7 @@ services:
   vault-hsm:
     image: hashicorp/vault-enterprise:1.21.4-ent
     container_name: vault-hsm
+    user: "root"
     ports:
       - "8201:8200"
     environment:
@@ -12,34 +13,39 @@ services:
       - IPC_LOCK
     volumes:
       - ./config/vault-hsm.hcl:/vault/config/vault.hcl
-      - vault-hsm-data:/vault/data
+      - ./data/vault-hsm:/vault/data
     command: vault server -config=/vault/config/vault.hcl
     networks:
       - vault-net
+    healthcheck:
+      test: ["CMD", "sh", "-c", "vault status 2>/dev/null | grep -q 'Sealed.*false'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
 
   vault-main:
     image: hashicorp/vault-enterprise:1.21.4-ent
     container_name: vault-main
+    user: "root"
     depends_on:
-      - vault-hsm
+      vault-hsm:
+        condition: service_healthy
     ports:
       - "8200:8200"
     environment:
       VAULT_LICENSE: ${VAULT_LICENSE}
       VAULT_ADDR: http://0.0.0.0:8200
-      VAULT_TRANSIT_SEAL_TOKEN: ${VAULT_HSM_TOKEN}
+      VAULT_TOKEN: ${VAULT_HSM_TOKEN}
     cap_add:
       - IPC_LOCK
     volumes:
       - ./config/vault-main.hcl:/vault/config/vault.hcl
-      - vault-main-data:/vault/data
+      - ./data/vault-main:/vault/data
     command: vault server -config=/vault/config/vault.hcl
     networks:
       - vault-net
 
-volumes:
-  vault-hsm-data:
-  vault-main-data:
 
 networks:
   vault-net:
