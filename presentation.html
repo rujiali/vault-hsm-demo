@@ -1029,27 +1029,32 @@
     <h2>What You Will See</h2>
     <div class="grid-2">
       <div>
-        <div style="margin-bottom:24px">
+        <div style="margin-bottom:20px">
           <div class="badge">Step 1</div>
           <h3>Encrypt sensitive data</h3>
           <p>Submit a personnel record → receive ciphertext. The key never leaves the HSM.</p>
         </div>
-        <div style="margin-bottom:24px">
+        <div style="margin-bottom:20px">
           <div class="badge">Step 2</div>
           <h3>Decrypt ciphertext</h3>
           <p>Authorised role decrypts the data. Unauthorised role is denied.</p>
         </div>
-      </div>
-      <div>
-        <div style="margin-bottom:24px">
+        <div>
           <div class="badge">Step 3</div>
           <h3>Rotate the key</h3>
           <p>Key rotated in Vault. Old ciphertext still decryptable. New encryptions use new version.</p>
         </div>
-        <div>
+      </div>
+      <div>
+        <div style="margin-bottom:20px">
           <div class="badge">Step 4</div>
           <h3>Separation of duties</h3>
           <p>Encrypt-only token attempts decryption → permission denied.</p>
+        </div>
+        <div>
+          <div class="badge">Step 5</div>
+          <h3>Key governance</h3>
+          <p>Inspect key flags (exportable, deletion). Sentinel blocks export outside business hours. Control Group enforces dual approval before key is exported. Deletion blocked by policy.</p>
         </div>
       </div>
     </div>
@@ -1075,7 +1080,7 @@
       <tr>
         <td style="color:#f6c90e">ISM-0507</td>
         <td>Cryptographic Key Management</td>
-        <td>Vault Transit manages full key lifecycle — creation, rotation, versioning and retirement</td>
+        <td>Vault Transit manages full key lifecycle — creation, rotation, versioning, retirement. Export and deletion controlled per key (<code>exportable=false</code>, <code>deletion_allowed=false</code>). Control Groups enforce dual authorisation for sensitive key operations.</td>
       </tr>
       <tr>
         <td style="color:#f6c90e">ISM-1080</td>
@@ -1095,7 +1100,12 @@
       <tr>
         <td style="color:#f6c90e">ISM-1402</td>
         <td>Protecting Credentials</td>
-        <td>Credentials and keys protected by HSM — master key held in vault-hsm, Transit keys never exposed in plaintext</td>
+        <td>Master key held in vault-hsm — never exported. Sentinel EGP enforces access conditions (time, IP). Control Groups prevent unilateral key export or deletion by any single operator.</td>
+      </tr>
+      <tr>
+        <td style="color:#f6c90e">ISM-0336</td>
+        <td>Separation of Duties</td>
+        <td>Least-privilege policies separate encrypt, decrypt, rotate, export, and delete roles. No single token can perform all operations. Control Groups enforce dual authorisation for high-risk actions.</td>
       </tr>
       <tr>
         <td style="color:#f6c90e">ISM-1324</td>
