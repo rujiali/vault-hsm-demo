@@ -47,6 +47,19 @@ services:
       - vault-net
 
 
+  demo-app:
+    build: ./app
+    container_name: demo-app
+    depends_on:
+      vault-hsm:
+        condition: service_healthy
+    ports:
+      - "5001:5000"
+    environment:
+      VAULT_ADDR: http://vault-main:8200
+    networks:
+      - vault-net
+
 networks:
   vault-net:
     driver: bridge

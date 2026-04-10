@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vault EaaS Demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --border: #30363d;
+      --accent: #00bc7d;
+      --text: #c9d1d9;
+      --muted: #8b949e;
+      --success: #3fb950;
+      --danger: #f85149;
+    }
+    * { box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: var(--accent); }
+
+    /* Navbar */
+    .navbar { background: var(--card); border-bottom: 1px solid var(--border); }
+    .navbar-brand { color: var(--accent) !important; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.03em; }
+
+    /* Cards */
+    .demo-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.5rem; }
+    .demo-card .card-header {
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .demo-card .card-body { padding: 1.25rem; }
+
+    /* Step badge */
+    .step-badge {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-title { margin: 0; font-size: 1rem; font-weight: 600; color: var(--text); }
+
+    /* Form controls */
+    .form-control, .form-select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .form-control:focus, .form-select:focus {
+      background: var(--bg);
+      border-color: var(--accent);
+      color: var(--text);
+      box-shadow: 0 0 0 0.2rem rgba(0,188,125,0.15);
+    }
+    .form-control::placeholder { color: var(--muted); }
+    .form-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.3rem; }
+    .form-select option { background: var(--card); }
+
+    /* Buttons */
+    .btn-accent {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+    }
+    .btn-accent:hover, .btn-accent:focus { background: #00a46d; color: #fff; }
+    .btn-accent:disabled { opacity: 0.5; }
+    .btn-outline-accent {
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      background: transparent;
+      font-weight: 600;
+    }
+    .btn-outline-accent:hover { background: var(--accent); color: #fff; }
+    .btn-outline-accent.active { background: var(--accent); color: #fff; }
+
+    /* Status indicators */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-dot.green { background: var(--success); box-shadow: 0 0 6px var(--success); }
+    .status-dot.red { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+    /* API panel */
+    .api-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 1rem;
+      transition: all 0.2s ease;
+    }
+    .api-panel-header {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .api-panel-header:hover { color: var(--text); }
+    .api-panel pre {
+      margin: 0;
+      padding: 0.75rem;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .api-panel.collapsed .api-panel-body { display: none; }
+
+    /* Result box */
+    .result-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.8rem;
+    }
+    .result-box.success { border-color: var(--success); color: var(--success); }
+    .result-box.error { border-color: var(--danger); color: var(--danger); }
+    .result-box .label { color: var(--muted); font-size: 0.72rem; margin-bottom: 0.25rem; }
+
+    /* Table */
+    .table { color: var(--text); }
+    .table th { color: var(--muted); font-size: 0.8rem; border-color: var(--border); font-weight: 500; }
+    .table td { border-color: var(--border); font-size: 0.85rem; vertical-align: middle; }
+    .table-hover tbody tr:hover { background: rgba(255,255,255,0.03); }
+    .cipher-cell {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.75rem;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .plaintext-row { background: rgba(0,188,125,0.05) !important; }
+
+    /* Permission matrix */
+    .perm-table th, .perm-table td { text-align: center; }
+    .perm-table td:first-child { text-align: left; font-weight: 500; }
+    .perm-icon { font-size: 1rem; }
+    .perm-icon.allowed { color: var(--success); }
+    .perm-icon.denied { color: var(--danger); }
+    .perm-icon.pending { color: var(--muted); }
+
+    /* Role tabs */
+    .role-btn { min-width: 130px; }
+
+    /* Key info */
+    .key-stat { text-align: center; }
+    .key-stat .num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+    .key-stat .lbl { font-size: 0.75rem; color: var(--muted); }
+
+    /* HSM badge */
+    .hsm-badge { font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 20px; font-weight: 600; }
+    .hsm-badge.connected { background: rgba(63,185,80,0.15); color: var(--success); border: 1px solid var(--success); }
+    .hsm-badge.sealed { background: rgba(248,81,73,0.15); color: var(--danger); border: 1px solid var(--danger); }
+
+    /* Spinner */
+    .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
+
+    /* Token input */
+    .token-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .token-section label { color: var(--accent); font-weight: 600; font-size: 0.85rem; }
+
+    /* Key hierarchy diagram */
+    .key-hierarchy { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+    .kh-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+    .kh-box {
+      border-radius: 8px;
+      padding: 0.65rem 1rem;
+      text-align: center;
+      min-width: 130px;
+      border: 2px solid;
+    }
+    .kh-box-title { font-weight: 700; font-size: 0.9rem; }
+    .kh-box-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+    .kh-data    { border-color: #58a6ff; color: #58a6ff; }
+    .kh-transit { border-color: var(--accent); color: var(--accent); }
+    .kh-master  { border-color: #f0883e; color: #f0883e; }
+    .kh-arrow-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0.4rem;
+      flex-shrink: 0;
+    }
+    .kh-arrow-line {
+      height: 2px;
+      width: 40px;
+      background: var(--border);
+      position: relative;
+    }
+    .kh-arrow-line::after {
+      content: '▶';
+      position: absolute;
+      right: -8px;
+      top: -9px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .kh-arrow-label { font-size: 0.68rem; color: var(--muted); margin-top: 0.3rem; white-space: nowrap; }
+    .kh-result-row { display: flex; align-items: center; gap: 0.5rem; padding-left: 0.25rem; }
+    .kh-result-arrow { color: var(--muted); font-size: 1.1rem; }
+    .kh-result-label { font-size: 0.82rem; color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container-lg">
+    <span class="navbar-brand">&#128274; Vault EaaS Demo</span>
+    <div class="ms-auto d-flex align-items-center gap-2">
+      <span id="hsm-badge" class="hsm-badge sealed">&#9679; Checking...</span>
+    </div>
+  </div>
+</nav>
+
+<div class="container-lg py-4" style="max-width:960px">
+
+  <!-- Token input -->
+  <div class="token-section">
+    <label for="root-token-input">Root / Vault Token</label>
+    <div class="input-group mt-1">
+      <input type="password" id="root-token-input" class="form-control" placeholder="Enter Vault token (used for all steps)" autocomplete="off">
+      <button class="btn btn-outline-accent" type="button" onclick="toggleTokenVisibility()">Show</button>
+    </div>
+    <div class="form-text" style="color:var(--muted)">This token is used by all steps below. Steps 1–3 require a token with transit permissions.</div>
+  </div>
+
+  <!-- Step 0: HSM Status -->
+  <div class="demo-card">
+    <div class="card-header">
+      <span class="step-badge">0</span>
+      <span class="card-title">HSM Integration Status</span>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 align-items-start">
+        <div class="col-md-8">
+          <div class="row g-2" id="status-grid">
+            <div class="col-6 col-md-4">
+              <div class="result-box" style="min-height:60px">
+                <div class="label">SEAL TYPE</div>
+                <div id="s-seal-type" style="color:var(--text);word-break:break-word">—</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="result-box" style="min-height:60px">
+                <div class="label">SEALED</div>
+                <div id="s-sealed">—</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="result-box" style="min-height:60px">
+                <div class="label">STORAGE</div>
+                <div id="s-storage" style="color:var(--text)">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 d-flex flex-column gap-2">
+          <button class="btn btn-accent" onclick="checkStatus(this)">
+            <span class="btn-label">Check Status</span>
+          </button>
+        </div>
+      </div>
+      <div id="status-api" class="api-panel collapsed">
+        <div class="api-panel-header" onclick="togglePanel('status-api')">
+          <span>API Call</span><span id="status-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="status-curl"></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Encrypt -->
+  <div class="demo-card">
+    <div class="card-header">
+      <span class="step-badge">1</span>
+      <span class="card-title">Encrypt Personnel Record</span>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="enc-name" class="form-control" placeholder="Jane Smith" value="Jane Smith">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Clearance Level</label>
+          <select id="enc-clearance" class="form-select">
+            <option value="TOP SECRET">TOP SECRET</option>
+            <option value="SECRET" selected>SECRET</option>
+            <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Employee ID</label>
+          <input type="text" id="enc-id" class="form-control" placeholder="EMP-001" value="EMP-001">
+        </div>
+      </div>
+      <!-- Key hierarchy diagram -->
+      <div class="key-hierarchy mt-4">
+        <div class="kh-label mb-2" style="color:var(--muted);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;">Key Hierarchy</div>
+        <div class="kh-flow">
+          <div class="kh-box kh-data">
+            <div class="kh-box-title">Plaintext</div>
+            <div class="kh-box-sub">Personnel record</div>
+          </div>
+          <div class="kh-arrow-col">
+            <div class="kh-arrow-line"></div>
+            <div class="kh-arrow-label">encrypted by</div>
+          </div>
+          <div class="kh-box kh-transit">
+            <div class="kh-box-title">Transit Key</div>
+            <div class="kh-box-sub">demo-key (in Vault)</div>
+          </div>
+          <div class="kh-arrow-col">
+            <div class="kh-arrow-line"></div>
+            <div class="kh-arrow-label">encrypted by</div>
+          </div>
+          <div class="kh-box kh-master">
+            <div class="kh-box-title">Master Key</div>
+            <div class="kh-box-sub">vault-hsm (never exported)</div>
+          </div>
+        </div>
+        <div class="kh-result-row mt-2">
+          <div class="kh-result-arrow">↓</div>
+          <div class="kh-result-label">Ciphertext stored in DB &nbsp;<span style="color:var(--muted);font-size:0.8rem;">(app never sees the keys)</span></div>
+        </div>
+      </div>
+
+      <button class="btn btn-accent mt-4" onclick="encryptRecord(this)">
+        <span class="btn-label">Encrypt &amp; Store</span>
+      </button>
+      <div id="enc-result"></div>
+      <div id="enc-api" class="api-panel collapsed">
+        <div class="api-panel-header" onclick="togglePanel('enc-api')">
+          <span>API Call</span><span id="enc-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="enc-curl"></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Records -->
+  <div class="demo-card">
+    <div class="card-header">
+      <span class="step-badge">2</span>
+      <span class="card-title">Records Database</span>
+      <button class="btn btn-outline-accent btn-sm ms-auto" onclick="loadRecords()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Employee ID</th>
+              <th>Timestamp</th>
+              <th>Ciphertext</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="records-tbody">
+            <tr><td colspan="4" class="text-center" style="color:var(--muted);padding:2rem">No records yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="dec-api" class="api-panel collapsed">
+        <div class="api-panel-header" onclick="togglePanel('dec-api')">
+          <span>API Call</span><span id="dec-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="dec-curl"></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Key Rotation -->
+  <div class="demo-card">
+    <div class="card-header">
+      <span class="step-badge">3</span>
+      <span class="card-title">Key Rotation</span>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 mb-3" id="key-stats">
+        <div class="col-6 col-md-3">
+          <div class="key-stat result-box">
+            <div class="num" id="kv-latest">—</div>
+            <div class="lbl">Latest Version</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="key-stat result-box">
+            <div class="num" id="kv-min">—</div>
+            <div class="lbl">Min Decrypt Version</div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-accent" onclick="rotateKey(this)">
+          <span class="btn-label">Rotate Key</span>
+        </button>
+        <button class="btn btn-outline-accent" onclick="verifyBackcompat(this)" id="backcompat-btn" disabled>
+          <span class="btn-label">Verify Backward Compat</span>
+        </button>
+      </div>
+      <div id="rot-result"></div>
+      <div id="rot-api" class="api-panel collapsed">
+        <div class="api-panel-header" onclick="togglePanel('rot-api')">
+          <span>API Call</span><span id="rot-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="rot-curl"></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Separation of Duties -->
+  <div class="demo-card">
+    <div class="card-header">
+      <span class="step-badge">4</span>
+      <span class="card-title">Separation of Duties</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <button class="btn btn-accent" onclick="initRoles(this)">
+          <span class="btn-label">Initialise Role Tokens</span>
+        </button>
+        <span id="roles-status" style="color:var(--muted);font-size:0.85rem"></span>
+      </div>
+
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-outline-accent role-btn active" id="role-btn-encrypt" onclick="selectRole('encrypt')">Encrypt Only</button>
+        <button class="btn btn-outline-accent role-btn" id="role-btn-decrypt" onclick="selectRole('decrypt')">Decrypt Only</button>
+        <button class="btn btn-outline-accent role-btn" id="role-btn-admin" onclick="selectRole('admin')">Key Admin</button>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-5">
+          <table class="table perm-table mb-0">
+            <thead>
+              <tr>
+                <th class="text-start" style="color:var(--muted)">Action</th>
+                <th style="color:var(--muted)">Permission</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Encrypt</td>
+                <td><span id="perm-encrypt" class="perm-icon pending">○</span></td>
+              </tr>
+              <tr>
+                <td>Decrypt</td>
+                <td><span id="perm-decrypt" class="perm-icon pending">○</span></td>
+              </tr>
+              <tr>
+                <td>Rotate Key</td>
+                <td><span id="perm-rotate" class="perm-icon pending">○</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-7">
+          <div id="role-token-display" class="result-box" style="color:var(--muted);min-height:80px">
+            <div class="label">ACTIVE ROLE TOKEN</div>
+            <div id="active-role-token" style="word-break:break-all;font-size:0.75rem">Not initialised</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-accent mt-3" onclick="testAllActions(this)">
+        <span class="btn-label">Test All Actions</span>
+      </button>
+
+      <div id="role-api" class="api-panel collapsed">
+        <div class="api-panel-header" onclick="togglePanel('role-api')">
+          <span>API Call</span><span id="role-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="role-curl"></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Key Governance -->
+  <div class="demo-card">
+    <div class="card-header">
+      <span class="step-badge">5</span>
+      <span class="card-title">Key Governance — Visibility, Export &amp; Control Groups</span>
+    </div>
+    <div class="card-body">
+
+      <!-- 5a: Key metadata -->
+      <h6 style="color:var(--accent);margin-bottom:12px">Key Visibility</h6>
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-outline-accent btn-sm" onclick="loadKeyInfo('demo-key')">
+          <span class="btn-label">Inspect demo-key</span>
+        </button>
+        <button class="btn btn-outline-accent btn-sm" onclick="loadKeyInfo('demo-key-managed')">
+          <span class="btn-label">Inspect demo-key-managed</span>
+        </button>
+      </div>
+      <div id="key-info-result" class="mb-3"></div>
+
+      <hr style="border-color:var(--border);margin:20px 0">
+
+      <!-- 5b: Export control -->
+      <h6 style="color:var(--accent);margin-bottom:12px">Export Control &amp; Control Group Workflow</h6>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:12px">
+        <code style="color:var(--accent)">demo-key</code> is non-exportable.
+        <code style="color:var(--accent)">demo-key-managed</code> is exportable but requires custodian approval (Control Group).
+      </p>
+
+      <div class="d-flex gap-2 mb-3 flex-wrap">
+        <button class="btn btn-outline-accent btn-sm" onclick="attemptExport('demo-key')">
+          <span class="btn-label">Try Export demo-key</span>
+        </button>
+        <button class="btn btn-outline-accent btn-sm" onclick="attemptExport('demo-key-managed')">
+          <span class="btn-label">Request Export demo-key-managed</span>
+        </button>
+      </div>
+      <div id="export-result" class="mb-3"></div>
+
+      <!-- Control group approval flow (shown after export request) -->
+      <div id="cg-approval-flow" style="display:none">
+        <div style="background:rgba(246,201,14,0.08);border:1px solid #f6c90e;border-radius:8px;padding:16px;margin-bottom:12px">
+          <div style="color:#f6c90e;font-weight:600;margin-bottom:8px">⏳ Awaiting Custodian Approval</div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-bottom:12px">
+            Wrapping token: <code id="cg-wrap-token-display" style="color:var(--text)"></code>
+          </div>
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <input type="password" id="cg-custodian-password" class="form-control form-control-sm" style="max-width:200px" placeholder="Custodian password" value="custodian123">
+            <button class="btn btn-sm" style="background:#f6c90e;color:#111;font-weight:600" onclick="custodianApprove()">
+              <span class="btn-label">Custodian Approve</span>
+            </button>
+          </div>
+        </div>
+        <div id="cg-approve-result"></div>
+
+        <div id="cg-unwrap-flow" style="display:none;margin-top:12px">
+          <button class="btn btn-accent btn-sm" onclick="requestorUnwrap()">
+            <span class="btn-label">Unwrap — Complete Export</span>
+          </button>
+          <div id="cg-unwrap-result" class="mt-2"></div>
+        </div>
+      </div>
+
+      <div id="gov-api" class="api-panel collapsed mt-2">
+        <div class="api-panel-header" onclick="togglePanel('gov-api')">
+          <span>API Call</span><span id="gov-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="gov-curl"></pre></div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:20px 0">
+
+      <!-- 5c: Deletion control -->
+      <h6 style="color:var(--accent);margin-bottom:12px">Deletion Control</h6>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:12px">
+        <code style="color:var(--accent)">demo-key</code> has <code>deletion_allowed=false</code> — protected permanently.
+        <code style="color:var(--accent)">demo-key-managed</code> has <code>deletion_allowed=true</code>.
+      </p>
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-accent btn-sm" onclick="attemptDelete('demo-key')">
+          <span class="btn-label">Try Delete demo-key</span>
+        </button>
+        <button class="btn btn-sm" style="background:#f85149;border:none;color:#fff;font-weight:600" onclick="attemptDelete('demo-key-managed')">
+          <span class="btn-label">Delete demo-key-managed</span>
+        </button>
+      </div>
+      <div id="delete-result" class="mt-3"></div>
+      <div id="del-api" class="api-panel collapsed mt-2">
+        <div class="api-panel-header" onclick="togglePanel('del-api')">
+          <span>API Call</span><span id="del-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="del-curl"></pre></div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ─── State ─────────────────────────────────────────────────────────────────
+let rootToken = '';
+let roleTokens = { encryptOnly: '', decryptOnly: '', keyAdmin: '' };
+let selectedRole = 'encrypt'; // encrypt | decrypt | admin
+let allRecords = [];
+
+// ─── Token input ────────────────────────────────────────────────────────────
+document.getElementById('root-token-input').addEventListener('input', function() {
+  rootToken = this.value.trim();
+});
+
+function toggleTokenVisibility() {
+  const inp = document.getElementById('root-token-input');
+  const btn = inp.nextElementSibling;
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+  else { inp.type = 'password'; btn.textContent = 'Show'; }
+}
+
+// ─── Utilities ──────────────────────────────────────────────────────────────
+function setLoading(btn, loading) {
+  const label = btn.querySelector('.btn-label');
+  if (loading) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Working...';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = `<span class="btn-label">${label ? label.textContent : btn.dataset.label || 'Go'}</span>`;
+  }
+}
+
+function showResult(elId, html, type) {
+  const el = document.getElementById(elId);
+  el.innerHTML = `<div class="result-box ${type}">${html}</div>`;
+}
+
+function showCurl(panelId, curlId, curl) {
+  const panel = document.getElementById(panelId);
+  document.getElementById(curlId).textContent = curl || '';
+  panel.classList.remove('collapsed');
+  document.getElementById(panelId + '-arrow').textContent = '▲';
+}
+
+function togglePanel(id) {
+  const panel = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  panel.classList.toggle('collapsed');
+  arrow.textContent = panel.classList.contains('collapsed') ? '▼' : '▲';
+}
+
+function fmtTs(ts) {
+  try { return new Date(ts).toLocaleString(); } catch { return ts; }
+}
+
+function truncate(str, n) {
+  if (!str) return '';
+  return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
+// ─── Step 0: Status ──────────────────────────────────────────────────────────
+async function checkStatus(btn) {
+  const origLabel = btn.querySelector('.btn-label').textContent;
+  btn.dataset.label = origLabel;
+  setLoading(btn, true);
+  try {
+    const r = await fetch('/api/status');
+    const d = await r.json();
+    document.getElementById('s-seal-type').textContent = d.seal_type || d.error || '—';
+    const sealedEl = document.getElementById('s-sealed');
+    if (d.sealed === true) {
+      sealedEl.innerHTML = '<span style="color:var(--danger)">Yes</span>';
+    } else if (d.sealed === false) {
+      sealedEl.innerHTML = '<span style="color:var(--success)">No</span>';
+    } else {
+      sealedEl.textContent = '—';
+    }
+    document.getElementById('s-storage').textContent = d.storage_type || '—';
+    showCurl('status-api', 'status-curl', d.curl);
+
+    // Update navbar badge
+    const badge = document.getElementById('hsm-badge');
+    if (d.sealed === false) {
+      badge.className = 'hsm-badge connected';
+      badge.innerHTML = '&#9679; HSM Connected';
+    } else {
+      badge.className = 'hsm-badge sealed';
+      badge.innerHTML = '&#9679; Sealed';
+    }
+  } catch (e) {
+    showResult('s-seal-type', 'Error: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+    btn.querySelector('.btn-label').textContent = origLabel;
+  }
+}
+
+// ─── Step 1: Encrypt ─────────────────────────────────────────────────────────
+async function encryptRecord(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  const name = document.getElementById('enc-name').value.trim();
+  const clearance = document.getElementById('enc-clearance').value;
+  const id = document.getElementById('enc-id').value.trim();
+  if (!name || !id) { alert('Fill in Name and Employee ID.'); return; }
+
+  btn.dataset.label = btn.querySelector('.btn-label').textContent;
+  setLoading(btn, true);
+  try {
+    const r = await fetch('/api/encrypt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: rootToken, record: { name, clearance, id } })
+    });
+    const d = await r.json();
+    if (d.error) {
+      showResult('enc-result', 'Error: ' + JSON.stringify(d.error), 'error');
+    } else {
+      showResult('enc-result',
+        `<div class="label">RECORD ID</div><div>${d.record_id}</div>` +
+        `<div class="label mt-2">CIPHERTEXT</div>` +
+        `<div title="${d.ciphertext}" style="word-break:break-all">${d.ciphertext}</div>`,
+        'success');
+      loadRecords();
+    }
+    showCurl('enc-api', 'enc-curl', d.curl);
+  } catch (e) {
+    showResult('enc-result', 'Error: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+    btn.querySelector('.btn-label').textContent = 'Encrypt & Store';
+  }
+}
+
+// ─── Step 2: Records ─────────────────────────────────────────────────────────
+async function loadRecords() {
+  try {
+    const r = await fetch('/api/records');
+    allRecords = await r.json();
+    renderRecords();
+  } catch (e) {
+    console.error('loadRecords:', e);
+  }
+}
+
+function renderRecords() {
+  const tbody = document.getElementById('records-tbody');
+  if (!allRecords.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:var(--muted);padding:2rem">No records yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allRecords.map(rec => `
+    <tr id="rec-row-${rec.id}">
+      <td><code style="color:var(--accent)">${rec.id}</code></td>
+      <td style="color:var(--muted);font-size:0.8rem">${fmtTs(rec.timestamp)}</td>
+      <td class="cipher-cell" title="${rec.ciphertext}">${truncate(rec.ciphertext, 40)}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-accent" onclick="decryptRow('${rec.id}', this)">Decrypt</button>
+      </td>
+    </tr>
+    <tr id="plain-row-${rec.id}" style="display:none">
+      <td colspan="4" class="plaintext-row">
+        <span style="color:var(--muted);font-size:0.75rem">PLAINTEXT: </span>
+        <code id="plain-val-${rec.id}" style="color:var(--success)"></code>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function decryptRow(recordId, btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+  try {
+    const r = await fetch(`/api/decrypt/${recordId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: rootToken })
+    });
+    const d = await r.json();
+    showCurl('dec-api', 'dec-curl', d.curl);
+    if (d.error) {
+      showCurl('dec-api', 'dec-curl', d.curl);
+      btn.textContent = 'Error';
+      btn.classList.add('btn-danger');
+    } else {
+      document.getElementById('plain-val-' + recordId).textContent = d.plaintext;
+      const plainRow = document.getElementById('plain-row-' + recordId);
+      plainRow.style.display = '';
+      btn.textContent = 'Hide';
+      btn.onclick = () => {
+        plainRow.style.display = 'none';
+        btn.textContent = 'Decrypt';
+        btn.onclick = () => decryptRow(recordId, btn);
+      };
+    }
+  } catch (e) {
+    btn.textContent = 'Error';
+  } finally {
+    btn.disabled = false;
+    if (btn.textContent !== 'Hide' && btn.textContent !== 'Error') btn.textContent = orig;
+  }
+}
+
+// ─── Step 3: Key Rotation ────────────────────────────────────────────────────
+async function rotateKey(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  btn.dataset.label = btn.querySelector('.btn-label').textContent;
+  setLoading(btn, true);
+  document.getElementById('rot-result').innerHTML = '';
+  try {
+    const r = await fetch('/api/rotate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: rootToken })
+    });
+    const d = await r.json();
+    showCurl('rot-api', 'rot-curl', d.curl);
+    if (d.error) {
+      showResult('rot-result', 'Error: ' + JSON.stringify(d.error), 'error');
+    } else {
+      document.getElementById('kv-latest').textContent = d.latest_version ?? '—';
+      document.getElementById('kv-min').textContent = d.min_decryption_version ?? '—';
+      showResult('rot-result',
+        `<div class="label">KEY ROTATED</div>` +
+        `<div>Latest version: <strong style="color:var(--accent)">${d.latest_version}</strong> &nbsp;|&nbsp; ` +
+        `Min decrypt version: <strong style="color:var(--accent)">${d.min_decryption_version}</strong></div>`,
+        'success');
+      document.getElementById('backcompat-btn').disabled = false;
+    }
+  } catch (e) {
+    showResult('rot-result', 'Error: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+    btn.querySelector('.btn-label').textContent = 'Rotate Key';
+  }
+}
+
+async function verifyBackcompat(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  if (!allRecords.length) { alert('No records to decrypt. Encrypt something in Step 1 first.'); return; }
+  btn.dataset.label = btn.querySelector('.btn-label').textContent;
+  setLoading(btn, true);
+  try {
+    const oldest = allRecords[0];
+    const r = await fetch(`/api/decrypt/${oldest.id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: rootToken })
+    });
+    const d = await r.json();
+    showCurl('rot-api', 'rot-curl', d.curl);
+    if (d.error) {
+      showResult('rot-result', 'Backward compat FAILED: ' + JSON.stringify(d.error), 'error');
+    } else {
+      showResult('rot-result',
+        `<div class="label">BACKWARD COMPATIBILITY VERIFIED</div>` +
+        `<div>Decrypted oldest record (${oldest.id}) with current key:</div>` +
+        `<div style="margin-top:0.4rem;word-break:break-all">${d.plaintext}</div>`,
+        'success');
+    }
+  } catch (e) {
+    showResult('rot-result', 'Error: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+    btn.querySelector('.btn-label').textContent = 'Verify Backward Compat';
+  }
+}
+
+// ─── Step 4: Roles ───────────────────────────────────────────────────────────
+async function initRoles(btn) {
+  if (!rootToken) { alert('Enter a root Vault token first.'); return; }
+  btn.dataset.label = btn.querySelector('.btn-label').textContent;
+  setLoading(btn, true);
+  document.getElementById('roles-status').textContent = '';
+  try {
+    const r = await fetch('/api/init-roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: rootToken })
+    });
+    const d = await r.json();
+    if (d.encrypt_only) roleTokens.encryptOnly = d.encrypt_only;
+    if (d.decrypt_only) roleTokens.decryptOnly = d.decrypt_only;
+    if (d.key_admin)    roleTokens.keyAdmin    = d.key_admin;
+    document.getElementById('roles-status').textContent = '✓ Role tokens created';
+    document.getElementById('roles-status').style.color = 'var(--success)';
+    updateActiveRoleDisplay();
+    resetPermMatrix();
+  } catch (e) {
+    document.getElementById('roles-status').textContent = 'Error: ' + e.message;
+    document.getElementById('roles-status').style.color = 'var(--danger)';
+  } finally {
+    setLoading(btn, false);
+    btn.querySelector('.btn-label').textContent = 'Initialise Role Tokens';
+  }
+}
+
+function selectRole(role) {
+  selectedRole = role;
+  ['encrypt','decrypt','admin'].forEach(r => {
+    document.getElementById('role-btn-' + r).classList.toggle('active', r === role);
+  });
+  updateActiveRoleDisplay();
+  resetPermMatrix();
+}
+
+function getActiveToken() {
+  if (selectedRole === 'encrypt') return roleTokens.encryptOnly;
+  if (selectedRole === 'decrypt') return roleTokens.decryptOnly;
+  return roleTokens.keyAdmin;
+}
+
+function updateActiveRoleDisplay() {
+  const t = getActiveToken();
+  const el = document.getElementById('active-role-token');
+  el.textContent = t ? t : 'Not initialised — click "Initialise Role Tokens" first';
+  el.style.color = t ? 'var(--accent)' : 'var(--muted)';
+}
+
+function resetPermMatrix() {
+  ['perm-encrypt','perm-decrypt','perm-rotate'].forEach(id => {
+    const el = document.getElementById(id);
+    el.textContent = '○';
+    el.className = 'perm-icon pending';
+  });
+}
+
+function setPermResult(id, allowed) {
+  const el = document.getElementById(id);
+  if (allowed === true)  { el.textContent = '✓'; el.className = 'perm-icon allowed'; }
+  else if (allowed === false) { el.textContent = '✗'; el.className = 'perm-icon denied'; }
+  else { el.textContent = '○'; el.className = 'perm-icon pending'; }
+}
+
+async function testAllActions(btn) {
+  const token = getActiveToken();
+  if (!token) { alert('Initialise role tokens first.'); return; }
+  btn.dataset.label = btn.querySelector('.btn-label').textContent;
+  setLoading(btn, true);
+  resetPermMatrix();
+
+  const actions = ['encrypt','decrypt','rotate'];
+  const permIds = ['perm-encrypt','perm-decrypt','perm-rotate'];
+  let lastCurl = '';
+
+  for (let i = 0; i < actions.length; i++) {
+    try {
+      const r = await fetch('/api/role-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, action: actions[i] })
+      });
+      const d = await r.json();
+      setPermResult(permIds[i], d.allowed);
+      if (d.curl) lastCurl = d.curl;
+    } catch (e) {
+      setPermResult(permIds[i], false);
+    }
+  }
+
+  showCurl('role-api', 'role-curl', lastCurl);
+  setLoading(btn, false);
+  btn.querySelector('.btn-label').textContent = 'Test All Actions';
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+checkStatus(document.querySelector('[onclick="checkStatus(this)"]'));
+loadRecords();
+
+// ─── Step 5: Key Governance ───────────────────────────────────────────────────
+let cgWrapToken = '';
+let cgRequestorToken = '';
+let cgCustodianToken = '';
+
+async function loadKeyInfo(keyName) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  const r = await fetch(`/api/key-info/${keyName}?token=${encodeURIComponent(rootToken)}`);
+  const d = await r.json();
+  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  const el = document.getElementById('key-info-result');
+  if (d.error) { el.innerHTML = `<span class="text-danger">${JSON.stringify(d.error)}</span>`; return; }
+  el.innerHTML = `
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:0.85rem">
+      <div style="margin-bottom:6px"><strong style="color:var(--text)">${d.name}</strong></div>
+      <div class="d-flex gap-4">
+        <span>Exportable: <strong style="color:${d.exportable ? 'var(--success)' : 'var(--danger)'}">${d.exportable}</strong></span>
+        <span>Deletion Allowed: <strong style="color:${d.deletion_allowed ? 'var(--success)' : 'var(--danger)'}">${d.deletion_allowed}</strong></span>
+        <span>Latest Version: <strong style="color:var(--accent)">v${d.latest_version}</strong></span>
+      </div>
+    </div>`;
+}
+
+async function attemptExport(keyName) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  // For demo-key-managed use a key-exporter scoped token via root
+  const tokenResp = await fetch('/api/init-roles', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({token: rootToken})
+  });
+  const tokens = await tokenResp.json();
+
+  const useToken = keyName === 'demo-key-managed' ? (tokens.key_exporter || rootToken) : rootToken;
+  cgRequestorToken = useToken;
+
+  const r = await fetch('/api/export-key', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({token: useToken, key_name: keyName})
+  });
+  const d = await r.json();
+  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  const el = document.getElementById('export-result');
+  const cgFlow = document.getElementById('cg-approval-flow');
+
+  if (d.allowed) {
+    el.innerHTML = `<span class="text-success">✓ Export successful — key material returned</span>`;
+    cgFlow.style.display = 'none';
+  } else if (d.control_group) {
+    cgWrapToken = d.wrap_token;
+    el.innerHTML = `<span style="color:#f6c90e">⏳ Control group required — request held pending custodian approval</span>`;
+    document.getElementById('cg-wrap-token-display').textContent = d.wrap_token.substring(0, 20) + '...';
+    cgFlow.style.display = 'block';
+    document.getElementById('cg-unwrap-flow').style.display = 'none';
+    document.getElementById('cg-approve-result').innerHTML = '';
+    document.getElementById('cg-unwrap-result').innerHTML = '';
+  } else {
+    el.innerHTML = `<span class="text-danger">✗ ${d.error || 'Export blocked'}</span>`;
+    cgFlow.style.display = 'none';
+  }
+}
+
+async function custodianApprove() {
+  const password = document.getElementById('cg-custodian-password').value;
+  // Login as custodian
+  const loginResp = await fetch('/api/custodian-login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({password})
+  });
+  const loginData = await loginResp.json();
+  if (!loginData.token) {
+    document.getElementById('cg-approve-result').innerHTML = '<span class="text-danger">✗ Custodian login failed</span>';
+    return;
+  }
+  cgCustodianToken = loginData.token;
+
+  const r = await fetch('/api/control-group/approve', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({custodian_token: cgCustodianToken, wrap_token: cgWrapToken})
+  });
+  const d = await r.json();
+  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  const el = document.getElementById('cg-approve-result');
+  if (d.allowed) {
+    el.innerHTML = '<span class="text-success">✓ Custodian approved — requestor can now unwrap</span>';
+    document.getElementById('cg-unwrap-flow').style.display = 'block';
+  } else {
+    el.innerHTML = `<span class="text-danger">✗ Approval failed: ${d.error || 'unknown'}</span>`;
+  }
+}
+
+async function requestorUnwrap() {
+  const r = await fetch('/api/control-group/unwrap', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({requestor_token: cgRequestorToken, wrap_token: cgWrapToken})
+  });
+  const d = await r.json();
+  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  const el = document.getElementById('cg-unwrap-result');
+  if (d.allowed) {
+    el.innerHTML = '<span class="text-success">✓ Export complete — dual approval fulfilled. Key material retrieved.</span>';
+  } else {
+    el.innerHTML = `<span class="text-danger">✗ Unwrap failed: ${d.error || 'unknown'}</span>`;
+  }
+}
+
+async function attemptDelete(keyName) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  const r = await fetch('/api/delete-key', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({token: rootToken, key_name: keyName})
+  });
+  const d = await r.json();
+  showApiPanel('del-api', 'del-curl', 'del-api-arrow', d.curl || '');
+  const el = document.getElementById('delete-result');
+  if (d.allowed) {
+    el.innerHTML = `<span class="text-success">✓ ${keyName} deleted successfully</span>`;
+  } else {
+    el.innerHTML = `<span class="text-danger">✗ ${keyName}: ${d.error || 'Deletion blocked'}</span>`;
+  }
+}
+</script>
+</body>
+</html>

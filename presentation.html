@@ -389,8 +389,8 @@
           <div style="display:flex; align-items:flex-start; gap:16px">
             <div style="min-width:28px; height:28px; border-radius:50%; background:#f6c90e; color:#000; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.85rem">2</div>
             <div>
-              <p style="color:#fff; font-weight:600">Vault requests key from HSM via PKCS#11</p>
-              <p style="color:#64748b; font-size:0.9rem">Key is unwrapped inside HSM hardware — never exported</p>
+              <p style="color:#fff; font-weight:600">vault-main requests barrier key from vault-hsm via Transit Seal</p>
+              <p style="color:#64748b; font-size:0.9rem">Key is unwrapped by vault-hsm — never exported to disk</p>
             </div>
           </div>
 
@@ -438,7 +438,7 @@
             🏛️ Vault Transit<br><small>encrypts internally</small>
           </div>
           <div style="display:flex; flex-direction:column; align-items:center; gap:4px">
-            <div style="color:#475569; font-size:0.7rem">PKCS#11</div>
+            <div style="color:#475569; font-size:0.7rem">Transit Seal</div>
             <div class="arrow-right">
               <span></span><span></span><span></span>
             </div>
@@ -528,6 +528,90 @@
     </div>
   </div>
 
+  <!-- Slide 5: Runtime Flow -->
+  <div class="slide slide-dark" id="slide-runtime-flow">
+    <div class="eyebrow">Runtime Flow</div>
+    <h2>Startup vs. Per Request</h2>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:20px; align-items:start">
+
+      <!-- Left: Startup -->
+      <div>
+        <div style="display:inline-block; background:#1e293b; border:1px solid #f6c90e; border-radius:6px; padding:4px 12px; font-size:0.75rem; font-weight:700; color:#f6c90e; letter-spacing:0.06em; margin-bottom:14px">STARTUP — once only</div>
+
+        <div style="display:flex; flex-direction:column; gap:10px">
+
+          <div style="display:flex; align-items:flex-start; gap:12px">
+            <div style="min-width:26px; height:26px; border-radius:50%; background:#f6c90e; color:#111; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">1</div>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+              <strong style="color:#f0f0f0; font-size:0.88rem">vault-main starts — sealed</strong>
+              <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px">All storage encrypted at rest. Cannot serve requests.</p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:12px">
+            <div style="min-width:26px; height:26px; border-radius:50%; background:#f6c90e; color:#111; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">2</div>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+              <strong style="color:#f6c90e; font-size:0.88rem">→ vault-hsm: unwrap barrier key</strong>
+              <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px">vault-hsm uses master key to unwrap and return the barrier key. <strong style="color:#f0f0f0">Only engagement with vault-hsm.</strong></p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:12px">
+            <div style="min-width:26px; height:26px; border-radius:50%; background:#f6c90e; color:#111; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">3</div>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+              <strong style="color:#f0f0f0; font-size:0.88rem">Transit keyring loaded into memory</strong>
+              <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px">Barrier key decrypts storage. <code style="color:#00bc7d">demo-key</code> and all Transit keys cached in memory. vault-main is unsealed.</p>
+            </div>
+          </div>
+
+          <div style="padding:10px 14px; border:1px solid #f6c90e; border-radius:8px; background:rgba(246,201,14,0.05); font-size:0.8rem; color:#f6c90e">
+            🔑 Master key never leaves vault-hsm. Transit keys never touch disk in plaintext.
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: Per Request -->
+      <div>
+        <div style="display:inline-block; background:#1e293b; border:1px solid #00bc7d; border-radius:6px; padding:4px 12px; font-size:0.75rem; font-weight:700; color:#00bc7d; letter-spacing:0.06em; margin-bottom:14px">PER REQUEST — every call</div>
+
+        <div style="display:flex; flex-direction:column; gap:10px">
+
+          <div style="display:flex; align-items:flex-start; gap:12px">
+            <div style="min-width:26px; height:26px; border-radius:50%; background:#00bc7d; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">1</div>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+              <strong style="color:#f0f0f0; font-size:0.88rem">App → vault-main: plaintext + token</strong>
+              <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px">App calls <code style="color:#00bc7d">POST /v1/transit/encrypt/demo-key</code>. Token is validated against policy.</p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:12px">
+            <div style="min-width:26px; height:26px; border-radius:50%; background:#00bc7d; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">2</div>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+              <strong style="color:#f0f0f0; font-size:0.88rem">vault-main encrypts using in-memory key</strong>
+              <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px"><code style="color:#00bc7d">demo-key</code> already in memory. <strong style="color:#f6c90e">vault-hsm not called.</strong> Encryption is fast and local.</p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:12px">
+            <div style="min-width:26px; height:26px; border-radius:50%; background:#00bc7d; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">3</div>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+              <strong style="color:#f0f0f0; font-size:0.88rem">App receives ciphertext</strong>
+              <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px"><code style="color:#00bc7d">vault:v1:...</code> returned. Key never written to disk. App never saw the key.</p>
+            </div>
+          </div>
+
+          <div style="padding:10px 14px; border:1px solid #00bc7d; border-radius:8px; background:rgba(0,188,125,0.05); font-size:0.8rem; color:#00bc7d">
+            ⚡ vault-hsm re-engaged only on restart or key rotation — not on every request.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Slide 6: Vault Transit Engine -->
   <div class="slide slide-dark">
     <div class="eyebrow">Vault Transit Engine</div>
@@ -560,36 +644,36 @@
     <div class="grid-3">
       <div class="card">
         <div class="icon">🔐</div>
-        <h3>PKCS#11</h3>
-        <p>Industry standard protocol. Vault connects to HSM via PKCS#11 — same code path works with any certified HSM vendor.</p>
+        <h3>Transit Seal</h3>
+        <p>Vault's Transit seal allows one Vault instance to act as the root of trust for another — the same pattern as a hardware HSM, implemented in software.</p>
       </div>
       <div class="card card-accent">
         <div class="icon">🏛️</div>
         <h3>Auto-Unseal</h3>
-        <p>Vault uses the HSM to unseal automatically on restart. No human operator needed. Master key never exists in software.</p>
+        <p>vault-main unseals automatically on restart by calling vault-hsm. No human operator needed. Master key never exists on vault-main's disk.</p>
       </div>
       <div class="card">
         <div class="icon">🛡️</div>
         <h3>Seal Wrap</h3>
-        <p>Every sensitive value in Vault storage is wrapped by the HSM master key. Storage is useless without the HSM.</p>
+        <p>Every sensitive value in Vault storage is wrapped by the master key. vault-main's storage is useless without vault-hsm.</p>
       </div>
     </div>
     <div style="margin-top:32px">
       <table>
         <tr>
           <th>Environment</th>
-          <th>HSM</th>
-          <th>Protocol</th>
+          <th>Root of Trust</th>
+          <th>Mechanism</th>
         </tr>
         <tr>
-          <td>Demo</td>
-          <td>SoftHSM (software simulated)</td>
-          <td>PKCS#11</td>
+          <td>This Demo</td>
+          <td>vault-hsm (Vault Transit seal)</td>
+          <td>Transit Seal</td>
         </tr>
         <tr>
           <td>Production</td>
-          <td>Thales / Entrust / CloudHSM</td>
-          <td>PKCS#11</td>
+          <td>Thales / Entrust / CloudHSM / AWS KMS</td>
+          <td>PKCS#11 / KMS</td>
         </tr>
       </table>
     </div>
@@ -691,6 +775,185 @@
         </div>
 
       </div>
+    </div>
+  </div>
+
+  <!-- Key Governance slide -->
+  <div class="slide slide-dark" id="slide-key-governance">
+    <div class="eyebrow">Key Governance</div>
+    <h2>Who Controls the Keys?</h2>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:20px; align-items:start">
+
+      <!-- Left: four layers -->
+      <div style="display:flex; flex-direction:column; gap:12px">
+
+        <div style="background:#1e293b; border-left:4px solid #00bc7d; border-radius:0 8px 8px 0; padding:12px 16px">
+          <div style="color:#00bc7d; font-weight:700; font-size:0.9rem">1 — Key Configuration</div>
+          <p style="color:#94a3b8; font-size:0.82rem; margin-top:4px">Set at creation — <code style="color:#f0f0f0">exportable=false</code>, <code style="color:#f0f0f0">deletion_allowed=false</code>. Immutable. Even root cannot override.</p>
+        </div>
+
+        <div style="background:#1e293b; border-left:4px solid #58a6ff; border-radius:0 8px 8px 0; padding:12px 16px">
+          <div style="color:#58a6ff; font-weight:700; font-size:0.9rem">2 — ACL Policies</div>
+          <p style="color:#94a3b8; font-size:0.82rem; margin-top:4px">Controls <em>who</em> can call each API path. Key viewer, key exporter, key destroyer — all separate roles with least privilege.</p>
+        </div>
+
+        <div style="background:#1e293b; border-left:4px solid #f6c90e; border-radius:0 8px 8px 0; padding:12px 16px">
+          <div style="color:#f6c90e; font-weight:700; font-size:0.9rem">3 — Sentinel Policy (EGP)</div>
+          <p style="color:#94a3b8; font-size:0.82rem; margin-top:4px">Controls <em>under what conditions</em>. Time of day, IP range, MFA. Applied at the API endpoint — even privileged tokens are subject to it.</p>
+        </div>
+
+        <div style="background:#1e293b; border-left:4px solid #f85149; border-radius:0 8px 8px 0; padding:12px 16px">
+          <div style="color:#f85149; font-weight:700; font-size:0.9rem">4 — Control Groups</div>
+          <p style="color:#94a3b8; font-size:0.82rem; margin-top:4px">Requires a second human to approve. No single person can export or delete a key unilaterally. Dual control enforced by Vault.</p>
+        </div>
+
+      </div>
+
+      <!-- Right: permission matrix -->
+      <div>
+        <div style="color:#64748b; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px">Permission Matrix</div>
+        <table style="width:100%; font-size:0.82rem; border-collapse:collapse">
+          <thead>
+            <tr style="border-bottom:1px solid #334155">
+              <th style="text-align:left; padding:8px 10px; color:#64748b; font-weight:600">Role</th>
+              <th style="text-align:center; padding:8px 6px; color:#64748b; font-weight:600">Encrypt</th>
+              <th style="text-align:center; padding:8px 6px; color:#64748b; font-weight:600">Decrypt</th>
+              <th style="text-align:center; padding:8px 6px; color:#64748b; font-weight:600">Rotate</th>
+              <th style="text-align:center; padding:8px 6px; color:#64748b; font-weight:600">Export</th>
+              <th style="text-align:center; padding:8px 6px; color:#64748b; font-weight:600">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #1e293b">
+              <td style="padding:8px 10px; color:#f0f0f0">encrypt-only</td>
+              <td style="text-align:center; padding:8px 6px; color:#3fb950">✓</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1e293b">
+              <td style="padding:8px 10px; color:#f0f0f0">decrypt-only</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#3fb950">✓</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1e293b">
+              <td style="padding:8px 10px; color:#f0f0f0">key-admin</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#3fb950">✓</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1e293b">
+              <td style="padding:8px 10px; color:#f0f0f0">key-exporter</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f6c90e">⚠ approval</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 10px; color:#f0f0f0">key-destroyer</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#f85149">✗</td>
+              <td style="text-align:center; padding:8px 6px; color:#3fb950">✓</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top:14px; padding:10px 14px; border:1px solid #f6c90e; border-radius:8px; background:rgba(246,201,14,0.05); font-size:0.8rem; color:#f6c90e">
+          ⚠ Export requires Control Group approval — no single person can do it alone
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Control Groups slide -->
+  <div class="slide slide-dark" id="slide-control-groups">
+    <div class="eyebrow">Control Groups</div>
+    <h2>Dual Control — No Unilateral Action</h2>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:20px; align-items:start">
+
+      <!-- Left: workflow steps -->
+      <div style="display:flex; flex-direction:column; gap:12px">
+
+        <div style="display:flex; align-items:flex-start; gap:12px">
+          <div style="min-width:26px; height:26px; border-radius:50%; background:#58a6ff; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">1</div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+            <strong style="color:#58a6ff; font-size:0.88rem">Requestor calls export endpoint</strong>
+            <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px">Vault does not return the key. Instead returns a <strong style="color:#f0f0f0">wrapping token</strong> — the request is held pending approval.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; gap:12px">
+          <div style="min-width:26px; height:26px; border-radius:50%; background:#f6c90e; color:#111; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">2</div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+            <strong style="color:#f6c90e; font-size:0.88rem">Requestor sends wrapping token to custodian</strong>
+            <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px">Out of band — email, Slack, ticket. Custodian reviews the request.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; gap:12px">
+          <div style="min-width:26px; height:26px; border-radius:50%; background:#f6c90e; color:#111; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">3</div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+            <strong style="color:#f6c90e; font-size:0.88rem">Custodian authorises via Vault</strong>
+            <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px"><code style="color:#00bc7d">POST /v1/sys/control-group/authorize</code> — custodian identity is recorded in the audit log.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; gap:12px">
+          <div style="min-width:26px; height:26px; border-radius:50%; background:#00bc7d; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0">4</div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 14px; flex:1">
+            <strong style="color:#00bc7d; font-size:0.88rem">Requestor unwraps — gets the key</strong>
+            <p style="color:#94a3b8; font-size:0.8rem; margin-top:3px"><code style="color:#00bc7d">POST /v1/sys/wrapping/unwrap</code> — only succeeds after approval. Full audit trail of both parties.</p>
+          </div>
+        </div>
+
+        <div style="padding:10px 14px; border:1px solid #00bc7d; border-radius:8px; background:rgba(0,188,125,0.05); font-size:0.8rem; color:#00bc7d; margin-top:4px">
+          ✓ <strong>Every export is a two-person event — enforced by Vault, recorded in audit log.</strong>
+        </div>
+
+      </div>
+
+      <!-- Right: code -->
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div class="code-block" style="font-size:0.78rem">
+          <span class="comment"># Policy with control group</span><br>
+          path "transit/export/encryption-key/demo-key" {<br>
+          &nbsp;&nbsp;capabilities = ["read"]<br>
+          &nbsp;&nbsp;control_group = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;ttl = "1h"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;factor "authorise" {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;identity {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;group_names = ["key-custodians"]<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;approvals   = 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+          &nbsp;&nbsp;}<br>
+          }<br>
+        </div>
+
+        <div class="code-block" style="font-size:0.78rem">
+          <span class="comment"># Sentinel EGP — business hours only</span><br>
+          import "time"<br><br>
+          main = rule {<br>
+          &nbsp;&nbsp;time.now.hour >= 9 and<br>
+          &nbsp;&nbsp;time.now.hour &lt; 17<br>
+          }<br><br>
+          <span class="comment"># Applied to: transit/export/*</span><br>
+          <span class="comment"># Enforcement: hard-mandatory</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -832,7 +1095,7 @@
       <tr>
         <td style="color:#f6c90e">ISM-1402</td>
         <td>Protecting Credentials</td>
-        <td>Credentials and keys protected by HSM — hardware security module integration via PKCS#11</td>
+        <td>Credentials and keys protected by HSM — master key held in vault-hsm, Transit keys never exposed in plaintext</td>
       </tr>
       <tr>
         <td style="color:#f6c90e">ISM-1324</td>

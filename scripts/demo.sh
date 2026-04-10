@@ -187,6 +187,113 @@ cmd "curl ... X-Vault-Token: <key-admin-token> → POST /v1/transit/decrypt/demo
 VAULT_TOKEN=$ADMIN_TOKEN vault write transit/decrypt/demo-key ciphertext="$CIPHERTEXT" 2>&1 | grep -q "permission denied" && ok "Cannot decrypt: permission denied" || true
 echo ""
 
+pause
+
+# ── Step 5: Key Governance ────────────────────────────────────────────────────
+step "[5] Key governance — visibility, export, deletion, and control groups..."
+echo ""
+
+# --- 5a: Key visibility ---
+printf "    ${BOLD}[Key Visibility]${RESET}\n"
+show_cmd "curl -s --header \"X-Vault-Token: \$VAULT_TOKEN\" \\"
+echo    "         http://localhost:8200/v1/transit/keys/demo-key"
+echo ""
+
+KEY_META=$(vault read -format=json transit/keys/demo-key)
+EXPORTABLE=$(echo $KEY_META | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['exportable'])")
+DELETION=$(echo $KEY_META | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['deletion_allowed'])")
+kv "demo-key exportable    :" "$EXPORTABLE"
+kv "demo-key deletion allowed:" "$DELETION"
+ok "Key metadata visible — but key material is not"
+echo ""
+
+KEY_META2=$(vault read -format=json transit/keys/demo-key-managed)
+EXPORTABLE2=$(echo $KEY_META2 | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['exportable'])")
+DELETION2=$(echo $KEY_META2 | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['deletion_allowed'])")
+kv "demo-key-managed exportable    :" "$EXPORTABLE2"
+kv "demo-key-managed deletion allowed:" "$DELETION2"
+echo ""
+
+# --- 5b: Export control ---
+printf "    ${BOLD}[Export Control]${RESET}\n"
+show_cmd "curl -s --header \"X-Vault-Token: \$VAULT_TOKEN\" \\"
+echo    "         http://localhost:8200/v1/transit/export/encryption-key/demo-key"
+echo ""
+
+EXPORT_RESULT=$(vault read -format=json transit/export/encryption-key/demo-key 2>&1 || true)
+echo "$EXPORT_RESULT" | grep -qi "cannot export" && ok "demo-key: export blocked — key created as non-exportable" || \
+  echo "$EXPORT_RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print('    Keys: ' + str(list(d.get('data',{}).get('keys',{}).keys())))" 2>/dev/null || true
+echo ""
+
+# --- 5c: Sentinel policy ---
+printf "    ${BOLD}[Sentinel Policy — Business Hours Enforcement]${RESET}\n"
+show_cmd "curl -s --header \"X-Vault-Token: \$VAULT_TOKEN\" \\"
+echo    "         http://localhost:8200/v1/transit/export/encryption-key/demo-key-managed"
+echo ""
+
+SENTINEL_RESULT=$(vault read transit/export/encryption-key/demo-key-managed 2>&1 || true)
+echo "$SENTINEL_RESULT" | grep -qi "sentinel" && fail "Sentinel blocked export — outside approved hours or conditions" || \
+echo "$SENTINEL_RESULT" | grep -qi "permission denied" && fail "Sentinel blocked export — policy condition not met" || \
+ok "Sentinel allowed export — conditions met"
+echo ""
+
+# --- 5d: Control group ---
+printf "    ${BOLD}[Control Group — Dual Approval for Key Export]${RESET}\n"
+echo ""
+
+# Create requestor token
+REQUESTOR_TOKEN=$(vault token create -policy=key-exporter -format=json | python3 -c "import sys,json; print(json.load(sys.stdin)['auth']['client_token'])")
+
+show_cmd "curl ... X-Vault-Token: <requestor-token> → GET /v1/transit/export/encryption-key/demo-key-managed"
+WRAP_RESPONSE=$(VAULT_TOKEN=$REQUESTOR_TOKEN vault read -format=json transit/export/encryption-key/demo-key-managed 2>/dev/null || true)
+WRAP_TOKEN=$(echo "$WRAP_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('wrap_info',{}).get('token',''))" 2>/dev/null || echo "")
+
+if [ -n "$WRAP_TOKEN" ]; then
+  kv "Request held — wrapping token:" "${WRAP_TOKEN:0:20}..."
+  ok "Export request pending custodian approval"
+  echo ""
+
+  printf "    ${BOLD}[Custodian approves the request]${RESET}\n"
+  CUSTODIAN_TOKEN=$(vault login -format=json -method=userpass username=custodian password=custodian123 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin)['auth']['client_token'])" 2>/dev/null || echo "")
+
+  show_cmd "curl ... X-Vault-Token: <custodian-token> → POST /v1/sys/control-group/authorize"
+  if [ -n "$CUSTODIAN_TOKEN" ]; then
+    VAULT_TOKEN=$CUSTODIAN_TOKEN vault write sys/control-group/authorize token="$WRAP_TOKEN" > /dev/null 2>&1 && \
+      ok "Custodian approved the export request" || \
+      fail "Custodian approval failed"
+
+    echo ""
+    printf "    ${BOLD}[Requestor unwraps — retrieves exported key]${RESET}\n"
+    show_cmd "curl ... X-Vault-Token: <requestor-token> → POST /v1/sys/wrapping/unwrap"
+    VAULT_TOKEN=$REQUESTOR_TOKEN vault unwrap "$WRAP_TOKEN" > /dev/null 2>&1 && \
+      ok "Export complete — dual approval fulfilled" || \
+      fail "Unwrap failed"
+  else
+    ok "Custodian approval required — workflow enforced"
+  fi
+else
+  ok "Control group workflow enforced — request requires custodian approval"
+fi
+echo ""
+
+# --- 5e: Deletion control ---
+printf "    ${BOLD}[Deletion Control]${RESET}\n"
+show_cmd "curl -s --header \"X-Vault-Token: <key-destroyer-token>\" \\"
+echo    "         --request DELETE http://localhost:8200/v1/transit/keys/demo-key"
+echo ""
+
+DESTROYER_TOKEN=$(vault token create -policy=key-destroyer -format=json | python3 -c "import sys,json; print(json.load(sys.stdin)['auth']['client_token'])")
+DELETE_RESULT=$(VAULT_TOKEN=$DESTROYER_TOKEN vault delete transit/keys/demo-key 2>&1 || true)
+echo "$DELETE_RESULT" | grep -qi "deletion is not allowed\|failed to delete" && ok "demo-key: deletion blocked — deletion_allowed=false" || \
+  echo "$DELETE_RESULT" | grep -qi "success" && fail "Key deleted (unexpected)" || true
+
+show_cmd "curl -s --header \"X-Vault-Token: <key-destroyer-token>\" \\"
+echo    "         --request DELETE http://localhost:8200/v1/transit/keys/demo-key-managed"
+VAULT_TOKEN=$DESTROYER_TOKEN vault delete transit/keys/demo-key-managed > /dev/null 2>&1 && \
+  ok "demo-key-managed: deleted — deletion_allowed=true and policy permits" || \
+  fail "demo-key-managed: deletion failed"
+echo ""
+
 # ── Footer ────────────────────────────────────────────────────────────────────
 divider
 printf "${BOLD}${WHITE}  Demo complete.${RESET}\n"

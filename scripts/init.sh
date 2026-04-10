@@ -55,9 +55,118 @@ path "transit/keys/demo-key/rotate" {
 }
 EOF
 
+echo "==> Setting up key governance controls..."
+
+# Explicitly lock down demo-key
+vault write transit/keys/demo-key/config \
+  deletion_allowed=false
+
+# Create a second key for governance demo — exportable, deletable
+vault write -f transit/keys/demo-key-managed
+vault write transit/keys/demo-key-managed/config \
+  exportable=true \
+  deletion_allowed=true
+
+# Key viewer — read key metadata only, no operations
+vault policy write key-viewer - <<'EOF'
+path "transit/keys/demo-key" {
+  capabilities = ["read"]
+}
+path "transit/keys/demo-key-managed" {
+  capabilities = ["read"]
+}
+EOF
+
+# Key custodian — can approve control group requests
+vault policy write key-custodian - <<'EOF'
+path "sys/control-group/authorize" {
+  capabilities = ["create", "update"]
+}
+path "sys/control-group/request" {
+  capabilities = ["read", "update"]
+}
+path "transit/export/encryption-key/demo-key-managed" {
+  capabilities = ["read"]
+}
+EOF
+
+# Key destroyer — can enable deletion and delete key
+vault policy write key-destroyer - <<'EOF'
+path "transit/keys/demo-key-managed/config" {
+  capabilities = ["create", "update"]
+}
+path "transit/keys/demo-key-managed" {
+  capabilities = ["delete"]
+}
+EOF
+
+# Key exporter — export requires control group approval
+vault policy write key-exporter - <<'EOF'
+path "transit/export/encryption-key/demo-key-managed" {
+  capabilities = ["read"]
+  control_group = {
+    ttl = "1h"
+    factor "authorise" {
+      identity {
+        group_names = ["key-custodians"]
+        approvals   = 1
+      }
+    }
+  }
+}
+EOF
+
+echo "==> Enabling userpass auth for control group demo..."
+vault auth enable userpass
+
+# Create custodian user
+vault write auth/userpass/users/custodian \
+  password=custodian123 \
+  policies=key-custodian
+
+# Create entity for custodian and link to userpass
+ACCESSOR=$(vault auth list -format=json | python3 -c "import sys,json; print(json.load(sys.stdin)['userpass/']['accessor'])")
+
+ENTITY_ID=$(vault write -format=json identity/entity \
+  name="custodian" \
+  policies="key-custodian" | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['id'])")
+
+vault write identity/entity-alias \
+  name="custodian" \
+  canonical_id="$ENTITY_ID" \
+  mount_accessor="$ACCESSOR"
+
+# Create key-custodians group and add custodian entity
+vault write identity/group \
+  name="key-custodians" \
+  type="internal" \
+  policies="key-custodian" \
+  member_entity_ids="$ENTITY_ID"
+
+echo "==> Applying Sentinel policy — restrict export to business hours..."
+SENTINEL_B64=$(python3 -c "
+import base64
+policy = '''
+import \"time\"
+import \"sockaddr\"
+
+# Allow export only during business hours (9am-5pm)
+main = rule {
+    time.now.hour >= 9 and time.now.hour < 17
+}
+'''
+print(base64.b64encode(policy.encode()).decode())
+")
+
+vault write sys/policies/egp/export-business-hours \
+  policy="$SENTINEL_B64" \
+  paths='["transit/export/*"]' \
+  enforcement_level="soft-mandatory"
+
 echo ""
 echo "==> Setup complete!"
-echo "    vault-main UI : http://localhost:8200"
-echo "    Root token    : $ROOT_TOKEN"
+echo "    vault-main UI      : http://localhost:8200"
+echo "    Root token         : $ROOT_TOKEN"
+echo "    Custodian user     : custodian / custodian123"
 echo ""
-echo "    Run the demo  : ./scripts/demo.sh"
+echo "    Run the demo       : ./scripts/demo.sh"
