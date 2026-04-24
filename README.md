@@ -2,12 +2,12 @@
 
 Demonstrates **Encryption as a Service** and **HSM integration** using two HashiCorp Vault Enterprise instances:
 
-- `vault-hsm` — acts as the root of trust (mimics an HSM via Vault Transit seal)
-- `vault-main` — auto-unseals via `vault-hsm`, runs the Transit EaaS engine for applications
+- `vault-hsm` — acts as the root of trust; exposes a KMIP endpoint (port 5696) used as the HSM substitute
+- `vault-main` — auto-unseals via PKCS#11 (`libvault-pkcs11.so` → KMIP → `vault-hsm`), runs the Transit EaaS engine for applications
 
 ## What this demo shows
 
-- Vault auto-unsealing via Transit seal (HSM pattern — master key never leaves vault-hsm)
+- Vault auto-unsealing via PKCS#11 seal (HSM pattern — `libvault-pkcs11.so` speaks KMIP to vault-hsm; master key never leaves vault-hsm)
 - Transit engine for Encryption as a Service
 - Encryption key never exposed to applications
 - Key rotation with backward compatibility
@@ -49,12 +49,12 @@ docker compose up -d vault-main
 
 ```
 App → vault-main (Transit EaaS)
-              ↓  Transit seal
+              ↓  PKCS#11 seal (libvault-pkcs11.so → KMIP)
          vault-hsm (root of trust)
          master key lives here, never exported
 ```
 
 | Instance  | Port | Role |
 |-----------|------|------|
-| vault-hsm  | 8201 | HSM mimic — holds master key via Transit seal |
+| vault-hsm  | 8201 | HSM mimic — KMIP key server (port 5696), master key never exported |
 | vault-main | 8200 | Application-facing — Encryption as a Service |

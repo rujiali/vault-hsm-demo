@@ -444,7 +444,7 @@
 
         <div style="display:flex;align-items:flex-start;gap:14px">
           <div style="min-width:26px;height:26px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.82rem;flex-shrink:0">2</div>
-          <div><p style="color:var(--text-1);font-weight:600">Vault requests the barrier key from the HSM via Transit Seal</p><p style="color:var(--text-dim);font-size:0.88rem">Key is unwrapped by the HSM — never exported to disk</p></div>
+          <div><p style="color:var(--text-1);font-weight:600">Vault requests the barrier key from the HSM via PKCS#11 / KMIP</p><p style="color:var(--text-dim);font-size:0.88rem">libvault-pkcs11.so calls vault-hsm's KMIP engine — key never exported to disk</p></div>
         </div>
 
         <div style="display:flex;align-items:flex-start;gap:14px">
@@ -467,7 +467,7 @@
         <div style="display:flex;align-items:center;gap:10px">
           <div class="flow-box highlighted" style="width:200px;padding:14px">🏛️ Vault Transit<br><small>encrypts internally</small></div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <div style="color:var(--text-dimmer);font-size:0.68rem">Transit Seal</div>
+            <div style="color:var(--text-dimmer);font-size:0.68rem">PKCS#11 / KMIP</div>
             <div class="arrow-right"><span></span><span></span><span></span></div>
           </div>
           <div class="flow-box" style="width:170px;padding:14px">🔒 HSM<br><small style="color:var(--text-dim)">key lives here</small></div>
@@ -481,7 +481,7 @@
         </div>
       </div>
     </div>
-    <div class="notes"><p>Walk through the four steps. Emphasise: the app only ever sends plaintext IN and receives ciphertext OUT. The HSM is only consulted at startup — not on every request.</p></div>
+    <div class="notes"><p>Walk through the four steps. Emphasise: the app only ever sends plaintext IN and receives ciphertext OUT. vault-hsm is only consulted via PKCS#11/KMIP at startup — not on every request.</p></div>
   </div>
 
   <!-- ④ Key Protection -->
@@ -626,8 +626,8 @@
     <div class="grid-3" data-anim="stagger">
       <div class="card">
         <div style="font-size:2.2rem;margin-bottom:12px">🔐</div>
-        <h3>Transit Seal</h3>
-        <p>Vault's Transit seal allows one Vault instance to act as the root of trust for another — the same pattern as a hardware HSM, implemented in software.</p>
+        <h3>PKCS#11 Seal</h3>
+        <p>vault-main unseals via <code>seal "pkcs11"</code> using <code>libvault-pkcs11.so</code> — HashiCorp's PKCS#11 provider that speaks KMIP to vault-hsm. Same interface used by physical HSMs.</p>
       </div>
       <div class="card card-accent">
         <div style="font-size:2.2rem;margin-bottom:12px">🏛️</div>
@@ -916,7 +916,7 @@
     <div style="margin-bottom:18px" data-anim="fade-in" style="animation-delay:.1s">
       <table>
         <tr><th>Environment</th><th>Root of Trust</th><th>Mechanism</th></tr>
-        <tr><td>This Demo</td><td>vault-hsm (Vault Transit seal)</td><td>Transit Seal</td></tr>
+        <tr><td>This Demo</td><td>vault-hsm (Vault KMIP engine)</td><td>PKCS#11 via libvault-pkcs11.so → KMIP</td></tr>
         <tr><td>Production</td><td>Thales / Entrust / CloudHSM / AWS KMS</td><td>PKCS#11 / KMS</td></tr>
       </table>
     </div>

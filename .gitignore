@@ -6,3 +6,4 @@ vault-init.json
 data/
 vault-hsm-init.json
 vault-main-init.json
+certs/

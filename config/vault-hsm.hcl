@@ -1,8 +1,9 @@
 ui            = true
 disable_mlock = true
 
-storage "file" {
-  path = "/vault/data"
+storage "raft" {
+  path    = "/vault/data"
+  node_id = "vault-hsm"
 }
 
 listener "tcp" {
@@ -10,5 +11,5 @@ listener "tcp" {
   tls_disable = true
 }
 
-api_addr     = "http://0.0.0.0:8200"
-cluster_addr = "http://0.0.0.0:8201"
+api_addr     = "http://vault-hsm:8200"
+cluster_addr = "http://vault-hsm:8201"

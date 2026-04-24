@@ -69,13 +69,13 @@ echo ""
 vault status -format=json | python3 -c "
 import sys, json
 s = json.load(sys.stdin)
-seal = s['type'] + ' (vault-hsm as root of trust)' if s['type'] == 'transit' else s['type']
+seal = s['type'] + ' (libvault-pkcs11.so → vault-hsm KMIP)' if s['type'] == 'pkcs11' else s['type']
 print('    {:<28} {}'.format('Seal Type    :', seal))
 print('    {:<28} {}'.format('Sealed       :', s['sealed']))
 print('    {:<28} {}'.format('Storage Type :', s['storage_type']))
 "
 echo ""
-ok "Vault is unsealed via Transit seal (vault-hsm) — master key never left the HSM"
+ok "Vault is unsealed via PKCS#11 seal (vault-hsm KMIP) — master key never left the HSM interface"
 
 pause
 

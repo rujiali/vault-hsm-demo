@@ -1,5 +1,5 @@
 #!/bin/bash
-# Initialise vault-main (auto-unseals via vault-hsm Transit seal)
+# Initialise vault-main (auto-unseals via PKCS#11 — libvault-pkcs11.so speaks KMIP to vault-hsm)
 set -e
 
 export VAULT_ADDR=http://localhost:8200
@@ -11,13 +11,21 @@ until curl -s $VAULT_ADDR/v1/sys/health 2>/dev/null | python3 -c "import sys,jso
   sleep 2
 done
 
-echo "==> Initialising vault-main..."
-INIT_OUTPUT=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format=json)
-ROOT_TOKEN=$(echo "$INIT_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['root_token'])")
-echo "$INIT_OUTPUT" > "$SCRIPT_DIR/vault-main-init.json"
-echo "    Init complete. Keys saved to vault-main-init.json (gitignored)"
+INITIALIZED=$(curl -s $VAULT_ADDR/v1/sys/health | python3 -c "import sys,json; s=json.load(sys.stdin); print('true' if s.get('initialized') else 'false')")
 
-echo "==> Vault is using Transit Auto-Unseal via vault-hsm — no manual unseal needed"
+if [ "$INITIALIZED" = "false" ]; then
+  echo "==> Initialising vault-main..."
+  INIT_OUTPUT=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format=json)
+  echo "$INIT_OUTPUT" > "$SCRIPT_DIR/vault-main-init.json"
+  echo "    Init complete. Keys saved to vault-main-init.json (gitignored)"
+else
+  echo "==> vault-main already initialised — loading saved keys from vault-main-init.json"
+  INIT_OUTPUT=$(cat "$SCRIPT_DIR/vault-main-init.json")
+fi
+
+ROOT_TOKEN=$(echo "$INIT_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['root_token'])")
+
+echo "==> Vault is using PKCS#11 Auto-Unseal via vault-hsm KMIP — no manual unseal needed"
 sleep 2
 
 # Confirm unsealed

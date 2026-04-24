@@ -1,8 +1,9 @@
 ui            = true
 disable_mlock = true
 
-storage "file" {
-  path = "/vault/data"
+storage "raft" {
+  path    = "/vault/data"
+  node_id = "vault-main"
 }
 
 listener "tcp" {
@@ -10,15 +11,16 @@ listener "tcp" {
   tls_disable = true
 }
 
-# Transit seal — vault-hsm acts as the HSM / root of trust
-# VAULT_TRANSIT_SEAL_TOKEN env var supplies the token at runtime
-seal "transit" {
-  address         = "http://vault-hsm:8200"
-  # token supplied via VAULT_TOKEN environment variable
-  mount_path      = "transit"
-  key_name        = "autounseal-key"
-  tls_skip_verify = true
+# PKCS#11 seal — libvault-pkcs11.so speaks KMIP to vault-hsm (port 5696).
+# The library reads /etc/vault-pkcs11.hcl for KMIP server address and mTLS certs.
+seal "pkcs11" {
+  lib            = "/usr/local/lib/libvault-pkcs11.so"
+  slot           = "0"
+  pin            = "KMIP"
+  key_label      = "vault-hsm-unseal-key"
+  hmac_key_label = "vault-hsm-hmac-key"
+  generate_key   = "true"
 }
 
-api_addr     = "http://0.0.0.0:8200"
-cluster_addr = "http://0.0.0.0:8201"
+api_addr     = "http://vault-main:8200"
+cluster_addr = "http://vault-main:8201"
