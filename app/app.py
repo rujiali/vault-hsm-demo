@@ -70,8 +70,8 @@ def api_status():
         return jsonify({"error": resp, "curl": curl}), status
 
     seal_type = resp.get("type", "unknown")
-    if seal_type == "transit":
-        seal_type = "transit (vault-hsm as root of trust)"
+    if seal_type == "pkcs11":
+        seal_type = "pkcs11 (libvault-pkcs11.so → KMIP → vault-hsm)"
 
     return jsonify({
         "seal_type": seal_type,
@@ -182,6 +182,15 @@ def api_rotate():
         "min_decryption_version": data.get("min_decryption_version"),
         "curl": curl,
     })
+
+
+@app.route("/api/policy/<policy_name>")
+def api_policy(policy_name):
+    token = request.args.get("token", "")
+    resp, status, curl = vault_req("GET", f"sys/policies/acl/{policy_name}", token)
+    if status != 200:
+        return jsonify({"error": resp, "curl": curl}), status
+    return jsonify({"policy": resp.get("data", {}).get("policy", ""), "curl": curl})
 
 
 @app.route("/api/init-roles", methods=["POST"])

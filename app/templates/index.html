@@ -321,6 +321,17 @@
           <input type="text" id="enc-id" class="form-control" placeholder="EMP-001" value="EMP-001">
         </div>
       </div>
+      <!-- Base64 explanation -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-top:1rem;font-size:0.82rem">
+        <div style="color:var(--accent);font-weight:600;margin-bottom:6px">Why is plaintext base64-encoded?</div>
+        <div style="color:var(--muted);line-height:1.6">
+          The Vault Transit API treats input as raw bytes, not text strings. Base64 is used as the transport encoding so arbitrary binary data can be sent as JSON safely.<br>
+          <span style="color:var(--text)">Original&nbsp;&nbsp;→</span> <code id="b64-original" style="color:var(--accent)">{"name":"Jane Smith","clearance":"SECRET","id":"EMP-001"}</code><br>
+          <span style="color:var(--text)">Base64&nbsp;&nbsp;&nbsp;→</span> <code id="b64-encoded" style="color:var(--muted);word-break:break-all">—</code><br>
+          <span style="color:var(--text)">Vault encrypts the underlying bytes and returns:</span> <code style="color:var(--accent)">vault:vN:&lt;ciphertext&gt;</code>
+        </div>
+      </div>
+
       <!-- Key hierarchy diagram -->
       <div class="key-hierarchy mt-4">
         <div class="kh-label mb-2" style="color:var(--muted);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;">Key Hierarchy</div>
@@ -454,6 +465,12 @@
         <button class="btn btn-outline-accent role-btn active" id="role-btn-encrypt" onclick="selectRole('encrypt')">Encrypt Only</button>
         <button class="btn btn-outline-accent role-btn" id="role-btn-decrypt" onclick="selectRole('decrypt')">Decrypt Only</button>
         <button class="btn btn-outline-accent role-btn" id="role-btn-admin" onclick="selectRole('admin')">Key Admin</button>
+      </div>
+
+      <!-- Policy viewer -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:1rem">
+        <div style="color:var(--muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Active Policy — <span id="policy-name-label" style="color:var(--accent)">encrypt-only</span></div>
+        <pre id="policy-hcl" style="margin:0;font-family:'SFMono-Regular',Consolas,monospace;font-size:0.78rem;color:var(--accent);white-space:pre-wrap;word-break:break-all">Loading...</pre>
       </div>
 
       <div class="row g-3">
@@ -612,6 +629,7 @@ let allRecords = [];
 // ─── Token input ────────────────────────────────────────────────────────────
 document.getElementById('root-token-input').addEventListener('input', function() {
   rootToken = this.value.trim();
+  if (rootToken) loadPolicy(selectedRole);
 });
 
 function toggleTokenVisibility() {
@@ -697,6 +715,20 @@ async function checkStatus(btn) {
     btn.querySelector('.btn-label').textContent = origLabel;
   }
 }
+
+// ─── Base64 preview ──────────────────────────────────────────────────────────
+function updateBase64Preview() {
+  const name = document.getElementById('enc-name').value.trim() || 'Jane Smith';
+  const clearance = document.getElementById('enc-clearance').value || 'SECRET';
+  const id = document.getElementById('enc-id').value.trim() || 'EMP-001';
+  const record = JSON.stringify({ name, clearance, id });
+  document.getElementById('b64-original').textContent = record;
+  document.getElementById('b64-encoded').textContent = btoa(unescape(encodeURIComponent(record)));
+}
+document.getElementById('enc-name').addEventListener('input', updateBase64Preview);
+document.getElementById('enc-clearance').addEventListener('change', updateBase64Preview);
+document.getElementById('enc-id').addEventListener('input', updateBase64Preview);
+updateBase64Preview();
 
 // ─── Step 1: Encrypt ─────────────────────────────────────────────────────────
 async function encryptRecord(btn) {
@@ -899,6 +931,22 @@ async function initRoles(btn) {
   }
 }
 
+const rolePolicyMap = { encrypt: 'encrypt-only', decrypt: 'decrypt-only', admin: 'key-admin' };
+
+async function loadPolicy(role) {
+  const policyName = rolePolicyMap[role];
+  document.getElementById('policy-name-label').textContent = policyName;
+  document.getElementById('policy-hcl').textContent = 'Loading...';
+  if (!rootToken) { document.getElementById('policy-hcl').textContent = '(enter a token to load policy)'; return; }
+  try {
+    const r = await fetch(`/api/policy/${policyName}?token=${encodeURIComponent(rootToken)}`);
+    const d = await r.json();
+    document.getElementById('policy-hcl').textContent = d.policy || d.error || '(empty)';
+  } catch (e) {
+    document.getElementById('policy-hcl').textContent = '(failed to load)';
+  }
+}
+
 function selectRole(role) {
   selectedRole = role;
   ['encrypt','decrypt','admin'].forEach(r => {
@@ -906,6 +954,7 @@ function selectRole(role) {
   });
   updateActiveRoleDisplay();
   resetPermMatrix();
+  loadPolicy(role);
 }
 
 function getActiveToken() {
