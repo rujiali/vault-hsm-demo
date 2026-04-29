@@ -4,251 +4,392 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vault EaaS Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root {
-      --bg: #0d1117;
-      --card: #161b22;
-      --border: #30363d;
-      --accent: #00bc7d;
-      --text: #c9d1d9;
-      --muted: #8b949e;
-      --success: #3fb950;
-      --danger: #f85149;
+      --bg:           #0d1117;
+      --surface:      #161b22;
+      --card:         #1c2128;
+      --card-hi:      #21262d;
+      --border:       #30363d;
+      --border-2:     #21262d;
+      --accent:       #58a6ff;
+      --accent-dim:   rgba(88,166,255,0.08);
+      --accent-glow:  rgba(88,166,255,0.14);
+      --accent-border:rgba(88,166,255,0.30);
+      --text:         #e6edf3;
+      --text-2:       #8b949e;
+      --muted:        #7d8590;
+      --success:      #3fb950;
+      --danger:       #f85149;
+      --warning:      #d29922;
+      --blue:         #58a6ff;
+      --orange:       #f0883e;
     }
+
     * { box-sizing: border-box; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    a { color: var(--accent); }
 
-    /* Navbar */
-    .navbar { background: var(--card); border-bottom: 1px solid var(--border); }
-    .navbar-brand { color: var(--accent) !important; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.03em; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
 
-    /* Cards */
-    .demo-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.5rem; }
-    .demo-card .card-header {
-      background: transparent;
+    a { color: var(--accent); text-decoration: none; }
+    code {
+      font-family: 'JetBrains Mono', "SFMono-Regular", Consolas, monospace;
+      font-size: 0.85em;
+    }
+
+    /* ── Navbar ─────────────────────────────────────────────────────────── */
+    .navbar {
+      background: rgba(8, 11, 20, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
-      padding: 1rem 1.25rem;
+      padding: 0.6rem 0;
+    }
+    .navbar-brand {
+      color: var(--text) !important;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .brand-icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: var(--accent);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(255,216,20,0.3);
+    }
+    .brand-sub { color: var(--muted); font-weight: 400; font-size: 0.8rem; margin-left: 2px; }
+
+    /* ── Cards ──────────────────────────────────────────────────────────── */
+    .demo-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.18);
+      overflow: hidden;
+    }
+    .demo-card .card-header {
+      background: var(--card-hi);
+      border-bottom: 1px solid var(--border);
+      padding: 0.875rem 1.5rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-    .demo-card .card-body { padding: 1.25rem; }
+    .demo-card .card-body { padding: 1.5rem; }
 
-    /* Step badge */
+    /* ── Step badge ─────────────────────────────────────────────────────── */
     .step-badge {
-      width: 28px; height: 28px;
-      border-radius: 50%;
+      width: 30px; height: 30px;
+      border-radius: 8px;
       background: var(--accent);
-      color: #fff;
+      color: #0d1117;
       font-weight: 700;
-      font-size: 0.8rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 0.78rem;
+      display: inline-flex; align-items: center; justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(88,166,255,0.22);
     }
-    .card-title { margin: 0; font-size: 1rem; font-weight: 600; color: var(--text); }
+    .card-title { margin: 0; font-size: 0.93rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+    .card-subtitle { color: var(--muted); font-size: 0.78rem; font-weight: 400; margin-left: 0.25rem; }
 
-    /* Form controls */
+    /* ── Form controls ──────────────────────────────────────────────────── */
     .form-control, .form-select {
-      background: var(--bg);
-      border: 1px solid var(--border);
+      background: var(--surface);
+      border: 1px solid var(--border-2);
       color: var(--text);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
     .form-control:focus, .form-select:focus {
-      background: var(--bg);
+      background: var(--surface);
       border-color: var(--accent);
       color: var(--text);
-      box-shadow: 0 0 0 0.2rem rgba(0,188,125,0.15);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+      outline: none;
     }
     .form-control::placeholder { color: var(--muted); }
-    .form-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.3rem; }
+    .form-label { color: var(--text-2); font-size: 0.78rem; font-weight: 500; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
     .form-select option { background: var(--card); }
+    .form-text { font-size: 0.76rem; color: var(--muted); }
 
-    /* Buttons */
+    /* ── Buttons ────────────────────────────────────────────────────────── */
+    .btn {
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      transition: all 0.15s ease;
+      letter-spacing: -0.01em;
+    }
     .btn-accent {
       background: var(--accent);
       border: none;
-      color: #fff;
-      font-weight: 600;
+      color: #0d1117;
+      box-shadow: 0 2px 8px rgba(88,166,255,0.18);
     }
-    .btn-accent:hover, .btn-accent:focus { background: #00a46d; color: #fff; }
-    .btn-accent:disabled { opacity: 0.5; }
+    .btn-accent:hover { background: #79b8ff; color: #0d1117; box-shadow: 0 4px 14px rgba(88,166,255,0.28); transform: translateY(-1px); }
+    .btn-accent:active { transform: translateY(0); }
+    .btn-accent:disabled { opacity: 0.45; transform: none; box-shadow: none; }
     .btn-outline-accent {
-      border: 1px solid var(--accent);
+      border: 1px solid var(--accent-border);
       color: var(--accent);
-      background: transparent;
+      background: var(--accent-dim);
       font-weight: 600;
     }
-    .btn-outline-accent:hover { background: var(--accent); color: #fff; }
-    .btn-outline-accent.active { background: var(--accent); color: #fff; }
+    .btn-outline-accent:hover { background: var(--accent); border-color: var(--accent); color: #0d1117; box-shadow: 0 2px 8px rgba(88,166,255,0.20); }
+    .btn-outline-accent.active { background: var(--accent); border-color: var(--accent); color: #0d1117; }
+    .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.78rem; border-radius: 6px; }
 
-    /* Status indicators */
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-    .status-dot.green { background: var(--success); box-shadow: 0 0 6px var(--success); }
-    .status-dot.red { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+    /* ── HSM badge ──────────────────────────────────────────────────────── */
+    .hsm-badge {
+      font-size: 0.72rem; padding: 0.3rem 0.75rem; border-radius: 6px;
+      font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em;
+    }
+    .hsm-badge.connected { background: rgba(88,166,255,0.10); color: var(--accent); border: 1px solid rgba(88,166,255,0.28); }
+    .hsm-badge.sealed    { background: rgba(239,68,68,0.1);  color: var(--danger);  border: 1px solid rgba(239,68,68,0.28); }
 
-    /* API panel */
-    .api-panel {
-      background: var(--bg);
+    /* ── Spinner ────────────────────────────────────────────────────────── */
+    .spinner-border-sm { width: 0.82rem; height: 0.82rem; }
+
+    /* ── Token bar ──────────────────────────────────────────────────────── */
+    .token-bar {
+      background: var(--card-hi);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 12px;
+      padding: 1rem 1.375rem;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .token-bar-label {
+      color: var(--accent); font-weight: 700; font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.09em; white-space: nowrap;
+    }
+    .token-bar .input-group { flex: 1; min-width: 260px; }
+
+    /* ── Stat boxes (step 0 / 3) ────────────────────────────────────────── */
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: 10px;
+      padding: 1rem 1.125rem;
+    }
+    .stat-box .stat-label { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; margin-bottom: 0.4rem; }
+    .stat-box .stat-value { color: var(--text); font-size: 0.9rem; word-break: break-word; }
+    .stat-box .stat-num   { color: var(--accent); font-size: 2rem; font-weight: 700; line-height: 1; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Result box ─────────────────────────────────────────────────────── */
+    .result-box {
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      font-family: 'JetBrains Mono', "SFMono-Regular", Consolas, monospace;
+      font-size: 0.8rem;
+    }
+    .result-box.success { border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.04); color: var(--success); }
+    .result-box.error   { border-color: rgba(239,68,68,0.35);  background: rgba(239,68,68,0.04);  color: var(--danger); }
+    .result-box .label  { color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
+
+    /* ── API panel ──────────────────────────────────────────────────────── */
+    .api-panel {
+      background: #030508;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       overflow: hidden;
       margin-top: 1rem;
-      transition: all 0.2s ease;
     }
     .api-panel-header {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-      cursor: pointer;
-      user-select: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 0.4rem 0.875rem;
+      font-size: 0.68rem; color: var(--muted);
+      cursor: pointer; user-select: none;
+      display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase; letter-spacing: 0.06em;
     }
-    .api-panel-header:hover { color: var(--text); }
+    .api-panel-header:hover { color: var(--text-2); }
     .api-panel pre {
-      margin: 0;
-      padding: 0.75rem;
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 0.78rem;
-      color: var(--accent);
-      white-space: pre-wrap;
-      word-break: break-all;
+      margin: 0; padding: 0.875rem;
+      font-family: 'JetBrains Mono', "SFMono-Regular", Consolas, monospace;
+      font-size: 0.775rem; color: var(--accent);
+      white-space: pre-wrap; word-break: break-all; line-height: 1.7;
     }
     .api-panel.collapsed .api-panel-body { display: none; }
 
-    /* Result box */
-    .result-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.75rem;
-      margin-top: 0.75rem;
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 0.8rem;
-    }
-    .result-box.success { border-color: var(--success); color: var(--success); }
-    .result-box.error { border-color: var(--danger); color: var(--danger); }
-    .result-box .label { color: var(--muted); font-size: 0.72rem; margin-bottom: 0.25rem; }
-
-    /* Table */
+    /* ── Table ──────────────────────────────────────────────────────────── */
     .table { color: var(--text); }
-    .table th { color: var(--muted); font-size: 0.8rem; border-color: var(--border); font-weight: 500; }
-    .table td { border-color: var(--border); font-size: 0.85rem; vertical-align: middle; }
-    .table-hover tbody tr:hover { background: rgba(255,255,255,0.03); }
+    .table th { color: var(--text-2); font-size: 0.72rem; border-color: var(--border); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1rem; }
+    .table td { border-color: var(--border); font-size: 0.85rem; vertical-align: middle; padding: 0.7rem 1rem; }
+    .table-hover tbody tr:hover td { background: rgba(255,255,255,0.02); }
     .cipher-cell {
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 0.75rem;
-      max-width: 220px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-family: 'JetBrains Mono', "SFMono-Regular", Consolas, monospace;
+      font-size: 0.73rem; max-width: 280px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: var(--muted);
     }
-    .plaintext-row { background: rgba(0,188,125,0.05) !important; }
+    .plaintext-row td { background: rgba(16,185,129,0.04) !important; }
 
-    /* Permission matrix */
+    /* ── Info box ───────────────────────────────────────────────────────── */
+    .info-box {
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: 9px;
+      padding: 14px 16px;
+      font-size: 0.82rem; color: var(--text-2); line-height: 1.7;
+    }
+    .info-title { color: var(--accent); font-weight: 600; font-size: 0.83rem; margin-bottom: 6px; }
+
+    /* ── Key hierarchy ──────────────────────────────────────────────────── */
+    .key-hierarchy {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.125rem 1.25rem;
+      height: 100%;
+    }
+    .kh-label { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; font-weight: 600; }
+    .kh-flow { display: flex; align-items: center; flex-wrap: wrap; }
+    .kh-box { border-radius: 8px; padding: 0.6rem 0.875rem; text-align: center; min-width: 100px; border: 1px solid; }
+    .kh-box-title { font-weight: 700; font-size: 0.83rem; }
+    .kh-box-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.2rem; }
+    .kh-data    { border-color: rgba(96,165,250,0.35); color: var(--blue);   background: rgba(96,165,250,0.06); }
+    .kh-transit { border-color: var(--accent-border);  color: var(--accent); background: var(--accent-dim); }
+    .kh-master  { border-color: rgba(251,146,60,0.35); color: var(--orange); background: rgba(251,146,60,0.06); }
+    .kh-arrow-col { display: flex; flex-direction: column; align-items: center; padding: 0 0.4rem; flex-shrink: 0; }
+    .kh-arrow-line { height: 1px; width: 28px; background: var(--border-2); position: relative; }
+    .kh-arrow-line::after { content: '▶'; position: absolute; right: -7px; top: -7px; font-size: 0.6rem; color: var(--muted); }
+    .kh-arrow-label { font-size: 0.63rem; color: var(--muted); margin-top: 0.3rem; white-space: nowrap; }
+    .kh-result-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.875rem; }
+    .kh-result-arrow { color: var(--muted); }
+    .kh-result-label { font-size: 0.8rem; color: var(--text-2); }
+
+    /* ── Role buttons ───────────────────────────────────────────────────── */
+    .role-btn { min-width: 118px; }
+
+    /* ── Permission table ───────────────────────────────────────────────── */
     .perm-table th, .perm-table td { text-align: center; }
     .perm-table td:first-child { text-align: left; font-weight: 500; }
     .perm-icon { font-size: 1rem; }
     .perm-icon.allowed { color: var(--success); }
-    .perm-icon.denied { color: var(--danger); }
+    .perm-icon.denied  { color: var(--danger); }
     .perm-icon.pending { color: var(--muted); }
 
-    /* Role tabs */
-    .role-btn { min-width: 130px; }
+    /* ── Concept banner ─────────────────────────────────────────────────── */
+    .concept-banner {
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      border-radius: 9px;
+      padding: 13px 16px;
+      margin-bottom: 1.375rem;
+      font-size: 0.83rem; color: var(--text-2); line-height: 1.7;
+    }
+    .concept-banner strong { color: var(--accent); }
 
-    /* Key info */
-    .key-stat { text-align: center; }
-    .key-stat .num { font-size: 2rem; font-weight: 700; color: var(--accent); }
-    .key-stat .lbl { font-size: 0.75rem; color: var(--muted); }
+    /* ── Phase block ────────────────────────────────────────────────────── */
+    .phase-block {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .phase-header {
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 0.85rem;
+    }
+    .phase-body { padding: 16px; }
+    .phase-operator { border-color: rgba(245,201,14,0.3); }
+    .phase-operator .phase-header { background: rgba(245,201,14,0.07); color: #f5c90e; border-bottom: 1px solid rgba(245,201,14,0.2); }
+    .phase-custodian { border-color: rgba(239,68,68,0.3); }
+    .phase-custodian .phase-header { background: rgba(239,68,68,0.07); color: #ef4444; border-bottom: 1px solid rgba(239,68,68,0.2); }
+    .phase-collect { border-color: rgba(245,201,14,0.3); }
+    .phase-collect .phase-header { background: rgba(245,201,14,0.07); color: #f5c90e; border-bottom: 1px solid rgba(245,201,14,0.2); }
 
-    /* HSM badge */
-    .hsm-badge { font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 20px; font-weight: 600; }
-    .hsm-badge.connected { background: rgba(63,185,80,0.15); color: var(--success); border: 1px solid var(--success); }
-    .hsm-badge.sealed { background: rgba(248,81,73,0.15); color: var(--danger); border: 1px solid var(--danger); }
+    /* ── Token pill ─────────────────────────────────────────────────────── */
+    .token-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.7rem; padding: 2px 8px; border-radius: 4px;
+      font-weight: 600; border: 1px solid;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tp-yellow { color: #f5c90e; border-color: rgba(245,201,14,0.4); background: rgba(245,201,14,0.08); }
+    .tp-red    { color: #ef4444; border-color: rgba(239,68,68,0.4);  background: rgba(239,68,68,0.08); }
+    .tp-green  { color: var(--accent); border-color: var(--accent-border); background: var(--accent-dim); }
 
-    /* Spinner */
-    .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
+    /* ── Actor flow ─────────────────────────────────────────────────────── */
+    .actor-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin-bottom: 1.375rem; }
+    .actor-box { border-radius: 8px; padding: 9px 14px; text-align: center; min-width: 118px; border: 1px solid; }
+    .actor-box .actor-name { font-weight: 700; font-size: 0.88rem; }
+    .actor-box .actor-role { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .actor-operator { border-color: rgba(245,201,14,0.45); background: rgba(245,201,14,0.06); }
+    .actor-operator .actor-name { color: #f5c90e; }
+    .actor-vault    { border-color: var(--accent-border); background: var(--accent-dim); }
+    .actor-vault .actor-name { color: var(--accent); }
+    .actor-custodian { border-color: rgba(239,68,68,0.45); background: rgba(239,68,68,0.06); }
+    .actor-custodian .actor-name { color: #ef4444; }
+    .actor-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 5px; flex-shrink: 0; }
+    .actor-arrow-line { height: 1px; width: 32px; background: var(--border-2); position: relative; }
+    .actor-arrow-line::after { content: '▶'; position: absolute; right: -7px; top: -7px; font-size: 0.6rem; color: var(--muted); }
+    .actor-arrow-label { font-size: 0.63rem; color: var(--muted); margin-top: 4px; white-space: nowrap; }
 
-    /* Token input */
-    .token-section {
-      background: var(--card);
+    /* ── Policy viewer ──────────────────────────────────────────────────── */
+    .policy-viewer {
+      background: #030508;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.5rem;
+      overflow: hidden;
     }
-    .token-section label { color: var(--accent); font-weight: 600; font-size: 0.85rem; }
-
-    /* Key hierarchy diagram */
-    .key-hierarchy { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
-    .kh-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
-    .kh-box {
-      border-radius: 8px;
-      padding: 0.65rem 1rem;
-      text-align: center;
-      min-width: 130px;
-      border: 2px solid;
-    }
-    .kh-box-title { font-weight: 700; font-size: 0.9rem; }
-    .kh-box-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
-    .kh-data    { border-color: #58a6ff; color: #58a6ff; }
-    .kh-transit { border-color: var(--accent); color: var(--accent); }
-    .kh-master  { border-color: #f0883e; color: #f0883e; }
-    .kh-arrow-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 0.4rem;
-      flex-shrink: 0;
-    }
-    .kh-arrow-line {
-      height: 2px;
-      width: 40px;
-      background: var(--border);
-      position: relative;
-    }
-    .kh-arrow-line::after {
-      content: '▶';
-      position: absolute;
-      right: -8px;
-      top: -9px;
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-    .kh-arrow-label { font-size: 0.68rem; color: var(--muted); margin-top: 0.3rem; white-space: nowrap; }
-    .kh-result-row { display: flex; align-items: center; gap: 0.5rem; padding-left: 0.25rem; }
-    .kh-result-arrow { color: var(--muted); font-size: 1.1rem; }
-    .kh-result-label { font-size: 0.82rem; color: var(--text); }
+    .policy-viewer-header { padding: 0.35rem 0.875rem; border-bottom: 1px solid var(--border); font-size: 0.68rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+    .policy-viewer pre { margin: 0; padding: 0.875rem; font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; color: var(--accent); white-space: pre-wrap; line-height: 1.7; }
   </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg sticky-top">
-  <div class="container-lg">
-    <span class="navbar-brand">&#128274; Vault EaaS Demo</span>
+  <div class="container-xl">
+    <span class="navbar-brand">
+      <span class="brand-icon">&#128274;</span>
+      Vault EaaS Demo
+      <span class="brand-sub">/ HashiCorp Vault Enterprise</span>
+    </span>
     <div class="ms-auto d-flex align-items-center gap-2">
       <span id="hsm-badge" class="hsm-badge sealed">&#9679; Checking...</span>
     </div>
   </div>
 </nav>
 
-<div class="container-lg py-4" style="max-width:960px">
+<div class="container-xl py-4" style="max-width:1280px">
 
-  <!-- Token input -->
-  <div class="token-section">
-    <label for="root-token-input">Root / Vault Token</label>
-    <div class="input-group mt-1">
-      <input type="password" id="root-token-input" class="form-control" placeholder="Enter Vault token (used for all steps)" autocomplete="off">
+  <!-- Token bar -->
+  <div class="token-bar">
+    <span class="token-bar-label">Vault Token</span>
+    <div class="input-group">
+      <input type="password" id="root-token-input" class="form-control" placeholder="Paste token — or auto-loaded from vault-main-init.json" autocomplete="off">
       <button class="btn btn-outline-accent" type="button" onclick="toggleTokenVisibility()">Show</button>
     </div>
-    <div class="form-text" style="color:var(--muted)">This token is used by all steps below. Steps 1–3 require a token with transit permissions.</div>
+    <div class="form-text w-100" style="padding-left:0">Used by all steps below. Auto-loaded on startup if vault-main-init.json is mounted.</div>
   </div>
 
   <!-- Step 0: HSM Status -->
@@ -259,32 +400,27 @@
     </div>
     <div class="card-body">
       <div class="row g-3 align-items-start">
-        <div class="col-md-8">
-          <div class="row g-2" id="status-grid">
-            <div class="col-6 col-md-4">
-              <div class="result-box" style="min-height:60px">
-                <div class="label">SEAL TYPE</div>
-                <div id="s-seal-type" style="color:var(--text);word-break:break-word">—</div>
+        <div class="col-12">
+          <div class="row g-3">
+            <div class="col-sm-4">
+              <div class="stat-box">
+                <div class="stat-label">Seal Type</div>
+                <div class="stat-value" id="s-seal-type">—</div>
               </div>
             </div>
-            <div class="col-6 col-md-4">
-              <div class="result-box" style="min-height:60px">
-                <div class="label">SEALED</div>
-                <div id="s-sealed">—</div>
+            <div class="col-sm-4">
+              <div class="stat-box">
+                <div class="stat-label">Sealed</div>
+                <div class="stat-value" id="s-sealed">—</div>
               </div>
             </div>
-            <div class="col-6 col-md-4">
-              <div class="result-box" style="min-height:60px">
-                <div class="label">STORAGE</div>
-                <div id="s-storage" style="color:var(--text)">—</div>
+            <div class="col-sm-4">
+              <div class="stat-box">
+                <div class="stat-label">Storage</div>
+                <div class="stat-value" id="s-storage">—</div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-md-4 d-flex flex-column gap-2">
-          <button class="btn btn-accent" onclick="checkStatus(this)">
-            <span class="btn-label">Check Status</span>
-          </button>
         </div>
       </div>
       <div id="status-api" class="api-panel collapsed">
@@ -296,114 +432,132 @@
     </div>
   </div>
 
-  <!-- Step 1: Encrypt -->
+  <!-- Section 1: DB Encryption with FPE -->
   <div class="demo-card">
     <div class="card-header">
       <span class="step-badge">1</span>
-      <span class="card-title">Encrypt Personnel Record</span>
+      <span class="card-title">Database Encryption — Existing Records</span>
     </div>
     <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Full Name</label>
-          <input type="text" id="enc-name" class="form-control" placeholder="Jane Smith" value="Jane Smith">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Clearance Level</label>
-          <select id="enc-clearance" class="form-select">
-            <option value="TOP SECRET">TOP SECRET</option>
-            <option value="SECRET" selected>SECRET</option>
-            <option value="CONFIDENTIAL">CONFIDENTIAL</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Employee ID</label>
-          <input type="text" id="enc-id" class="form-control" placeholder="EMP-001" value="EMP-001">
-        </div>
-      </div>
-      <!-- Base64 explanation -->
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-top:1rem;font-size:0.82rem">
-        <div style="color:var(--accent);font-weight:600;margin-bottom:6px">Why is plaintext base64-encoded?</div>
-        <div style="color:var(--muted);line-height:1.6">
-          The Vault Transit API treats input as raw bytes, not text strings. Base64 is used as the transport encoding so arbitrary binary data can be sent as JSON safely.<br>
-          <span style="color:var(--text)">Original&nbsp;&nbsp;→</span> <code id="b64-original" style="color:var(--accent)">{"name":"Jane Smith","clearance":"SECRET","id":"EMP-001"}</code><br>
-          <span style="color:var(--text)">Base64&nbsp;&nbsp;&nbsp;→</span> <code id="b64-encoded" style="color:var(--muted);word-break:break-all">—</code><br>
-          <span style="color:var(--text)">Vault encrypts the underlying bytes and returns:</span> <code style="color:var(--accent)">vault:vN:&lt;ciphertext&gt;</code>
-        </div>
-      </div>
-
-      <!-- Key hierarchy diagram -->
-      <div class="key-hierarchy mt-4">
-        <div class="kh-label mb-2" style="color:var(--muted);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;">Key Hierarchy</div>
-        <div class="kh-flow">
-          <div class="kh-box kh-data">
-            <div class="kh-box-title">Plaintext</div>
-            <div class="kh-box-sub">Personnel record</div>
+      <div class="row g-4">
+        <!-- Left: table + controls -->
+        <div class="col-lg-7">
+          <div class="info-box mb-3">
+            <div class="info-title">Simulated existing database table — <code>employees</code> (5 rows)</div>
+            The TFN column contains plaintext sensitive data. Vault Transform FPE encrypts each value in-place — preserving the 9-digit format, requiring no schema change, and remaining searchable because FPE is deterministic.
           </div>
-          <div class="kh-arrow-col">
-            <div class="kh-arrow-line"></div>
-            <div class="kh-arrow-label">encrypted by</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <button class="btn btn-outline-accent btn-sm" onclick="initTransform(this)">
+              <span class="btn-label">Init Transform Engine</span>
+            </button>
+            <button class="btn btn-accent btn-sm" id="btn-encrypt-table" onclick="encryptTable(this)" disabled>
+              <span class="btn-label">Encrypt Table (FPE)</span>
+            </button>
           </div>
-          <div class="kh-box kh-transit">
-            <div class="kh-box-title">Transit Key</div>
-            <div class="kh-box-sub">demo-key (in Vault)</div>
+          <div id="transform-init-result" class="mb-2" style="font-size:0.85rem"></div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:8px">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border-2)">
+                  <th style="color:var(--muted);font-weight:600;padding:6px 10px;text-align:left">ID</th>
+                  <th style="color:var(--muted);font-weight:600;padding:6px 10px;text-align:left">Name</th>
+                  <th style="color:var(--muted);font-weight:600;padding:6px 10px;text-align:left">Department</th>
+                  <th style="color:var(--muted);font-weight:600;padding:6px 10px;text-align:left">Tax File Number</th>
+                  <th style="color:var(--muted);font-weight:600;padding:6px 10px;text-align:left">Status</th>
+                </tr>
+              </thead>
+              <tbody id="db-tbody"></tbody>
+            </table>
           </div>
-          <div class="kh-arrow-col">
-            <div class="kh-arrow-line"></div>
-            <div class="kh-arrow-label">encrypted by</div>
-          </div>
-          <div class="kh-box kh-master">
-            <div class="kh-box-title">Master Key</div>
-            <div class="kh-box-sub">vault-hsm (never exported)</div>
+          <div id="encrypt-table-result" class="mt-1" style="font-size:0.85rem"></div>
+          <div id="transform-api" class="api-panel collapsed mt-2">
+            <div class="api-panel-header" onclick="togglePanel('transform-api')">
+              <span>API Call</span><span id="transform-api-arrow">&#9660;</span>
+            </div>
+            <div class="api-panel-body"><pre id="transform-curl"></pre></div>
           </div>
         </div>
-        <div class="kh-result-row mt-2">
-          <div class="kh-result-arrow">↓</div>
-          <div class="kh-result-label">Ciphertext stored in DB &nbsp;<span style="color:var(--muted);font-size:0.8rem;">(app never sees the keys)</span></div>
+        <!-- Right: search -->
+        <div class="col-lg-5">
+          <div id="search-panel-placeholder" style="color:var(--muted);font-size:0.9rem;padding:40px 0;text-align:center">
+            ← Encrypt the table first to enable search
+          </div>
+          <div id="fpe-search-panel" style="display:none">
+            <h6 style="color:var(--accent);font-weight:700;margin-bottom:10px">Search on Encrypted Data</h6>
+            <div class="info-box mb-3" style="font-size:0.82rem">
+              <div class="info-title">Encrypt the query term first</div>
+              FPE is deterministic — the same input always produces the same ciphertext. The app encrypts the search term via Vault, then runs the WHERE clause on the encrypted column. Works on any FPE-encrypted field.
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <select id="search-type" class="form-select" style="width:auto;flex-shrink:0" onchange="updateSearchHint()">
+                <option value="tfn">TFN</option>
+                <option value="name">Name</option>
+                <option value="dept">Department</option>
+              </select>
+              <input type="text" id="search-value" class="form-control" placeholder="e.g. 456789123" maxlength="9" inputmode="numeric">
+              <button class="btn btn-accent" onclick="searchEncrypted()">Search</button>
+            </div>
+            <div id="search-result"></div>
+            <div id="search-api" class="api-panel collapsed mt-2">
+              <div class="api-panel-header" onclick="togglePanel('search-api')">
+                <span>API Call</span><span id="search-api-arrow">&#9660;</span>
+              </div>
+              <div class="api-panel-body"><pre id="search-curl"></pre></div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <button class="btn btn-accent mt-4" onclick="encryptRecord(this)">
-        <span class="btn-label">Encrypt &amp; Store</span>
-      </button>
-      <div id="enc-result"></div>
-      <div id="enc-api" class="api-panel collapsed">
-        <div class="api-panel-header" onclick="togglePanel('enc-api')">
-          <span>API Call</span><span id="enc-api-arrow">&#9660;</span>
-        </div>
-        <div class="api-panel-body"><pre id="enc-curl"></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- Step 2: Records -->
+  <!-- Section 2: Encrypt (two-column) -->
   <div class="demo-card">
     <div class="card-header">
       <span class="step-badge">2</span>
-      <span class="card-title">Records Database</span>
-      <button class="btn btn-outline-accent btn-sm ms-auto" onclick="loadRecords()">Refresh</button>
+      <span class="card-title">FPE Encryption — Insert a New Record</span>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>Timestamp</th>
-              <th>Ciphertext</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="records-tbody">
-            <tr><td colspan="4" class="text-center" style="color:var(--muted);padding:2rem">No records yet</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div id="dec-api" class="api-panel collapsed">
-        <div class="api-panel-header" onclick="togglePanel('dec-api')">
-          <span>API Call</span><span id="dec-api-arrow">&#9660;</span>
+      <div class="row g-4">
+        <!-- Form + explanation -->
+        <div class="col-12">
+          <div class="row g-3 align-items-end">
+            <div class="col-sm-4">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="enc-name" class="form-control" placeholder="Frank Li" value="Frank Li">
+            </div>
+            <div class="col-sm-4">
+              <label class="form-label">Department</label>
+              <select id="enc-dept" class="form-select">
+                <option value="Finance">Finance</option>
+                <option value="Operations" selected>Operations</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Legal">Legal</option>
+                <option value="Payroll">Payroll</option>
+              </select>
+            </div>
+            <div class="col-sm-4">
+              <label class="form-label">Tax File Number</label>
+              <input type="text" id="enc-tfn" class="form-control" placeholder="654321987" value="654321987" maxlength="9">
+            </div>
+          </div>
+
+          <div class="info-box mt-3">
+            <div class="info-title">FPE encryption — all sensitive fields encoded before insert</div>
+            Name, Department, and TFN are each FPE-encoded via Vault Transform before the row is written. The database never holds plaintext values — and because FPE is deterministic, the new row is immediately searchable by any encrypted column, exactly like the existing rows.
+          </div>
+
+          <button class="btn btn-accent mt-3" onclick="encryptAndInsert(this)">
+            <span class="btn-label">FPE Encrypt &amp; Insert Row</span>
+          </button>
+          <div id="enc-result"></div>
+          <div id="enc-api" class="api-panel collapsed">
+            <div class="api-panel-header" onclick="togglePanel('enc-api')">
+              <span>API Call</span><span id="enc-api-arrow">&#9660;</span>
+            </div>
+            <div class="api-panel-body"><pre id="enc-curl"></pre></div>
+          </div>
         </div>
-        <div class="api-panel-body"><pre id="dec-curl"></pre></div>
+
       </div>
     </div>
   </div>
@@ -415,27 +569,27 @@
       <span class="card-title">Key Rotation</span>
     </div>
     <div class="card-body">
-      <div class="row g-3 mb-3" id="key-stats">
-        <div class="col-6 col-md-3">
-          <div class="key-stat result-box">
-            <div class="num" id="kv-latest">—</div>
-            <div class="lbl">Latest Version</div>
+      <div class="row g-3 mb-3 align-items-start">
+        <div class="col-sm-3 col-lg-2">
+          <div class="stat-box text-center">
+            <div class="stat-label">Latest Version</div>
+            <div class="stat-num" id="kv-latest">—</div>
           </div>
         </div>
-        <div class="col-6 col-md-3">
-          <div class="key-stat result-box">
-            <div class="num" id="kv-min">—</div>
-            <div class="lbl">Min Decrypt Version</div>
+        <div class="col-sm-3 col-lg-2">
+          <div class="stat-box text-center">
+            <div class="stat-label">Min Decrypt</div>
+            <div class="stat-num" id="kv-min">—</div>
           </div>
         </div>
-      </div>
-      <div class="d-flex gap-2 flex-wrap">
-        <button class="btn btn-accent" onclick="rotateKey(this)">
-          <span class="btn-label">Rotate Key</span>
-        </button>
-        <button class="btn btn-outline-accent" onclick="verifyBackcompat(this)" id="backcompat-btn" disabled>
-          <span class="btn-label">Verify Backward Compat</span>
-        </button>
+        <div class="col-sm-6 col-lg-8 d-flex align-items-center gap-2 flex-wrap" style="padding-top:0.5rem">
+          <button class="btn btn-accent" onclick="rotateKey(this)">
+            <span class="btn-label">Rotate Key</span>
+          </button>
+          <button class="btn btn-outline-accent" onclick="verifyBackcompat(this)" id="backcompat-btn" disabled>
+            <span class="btn-label">Verify Backward Compat</span>
+          </button>
+        </div>
       </div>
       <div id="rot-result"></div>
       <div id="rot-api" class="api-panel collapsed">
@@ -444,37 +598,69 @@
         </div>
         <div class="api-panel-body"><pre id="rot-curl"></pre></div>
       </div>
+
+      <hr style="border-color:var(--border);margin:1.75rem 0 1.25rem">
+      <div style="color:var(--muted);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.07em;font-weight:600;margin-bottom:0.75rem">Key Retirement</div>
+      <div class="info-box mb-3">
+        <div class="info-title">Retire old key versions — three-step demo</div>
+        <strong style="color:var(--text)">1. Rewrap</strong> — re-encrypts the test cipher to the current key version (the old ciphertext is saved).
+        <br><strong style="color:var(--text)">2. Retire</strong> — advances <code>min_decryption_version</code>, making all older versions permanently unreadable.
+        <br><strong style="color:var(--text)">3. Try Old Cipher</strong> — attempts to decrypt the pre-rewrap ciphertext; Vault returns an error proving it is gone.
+      </div>
+      <div class="d-flex gap-2 flex-wrap mb-2">
+        <button class="btn btn-outline-accent" onclick="rewrapAll(this)">
+          <span class="btn-label">Rewrap All Records</span>
+        </button>
+        <button class="btn btn-outline-accent" id="btn-retire" onclick="retireOldVersions(this)" disabled>
+          <span class="btn-label">Retire Old Versions</span>
+        </button>
+        <button class="btn btn-outline-accent" id="btn-try-old" onclick="tryRetiredCipher(this)" disabled style="border-color:rgba(248,81,73,0.4);color:var(--danger);background:rgba(248,81,73,0.06)">
+          <span class="btn-label">Try Old Cipher</span>
+        </button>
+      </div>
+      <div id="rewrap-result"></div>
+      <div id="rewrap-api" class="api-panel collapsed mt-2">
+        <div class="api-panel-header" onclick="togglePanel('rewrap-api')">
+          <span>API Call</span><span id="rewrap-api-arrow">&#9660;</span>
+        </div>
+        <div class="api-panel-body"><pre id="rewrap-curl"></pre></div>
+      </div>
     </div>
   </div>
 
-  <!-- Step 4: Separation of Duties -->
+  <!-- Step 4: Separation of Duties (two-column) -->
   <div class="demo-card">
     <div class="card-header">
       <span class="step-badge">4</span>
       <span class="card-title">Separation of Duties</span>
     </div>
     <div class="card-body">
-      <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-        <button class="btn btn-accent" onclick="initRoles(this)">
-          <span class="btn-label">Initialise Role Tokens</span>
-        </button>
-        <span id="roles-status" style="color:var(--muted);font-size:0.85rem"></span>
-      </div>
+      <div class="row g-4">
+        <!-- Left: init + role tabs + policy -->
+        <div class="col-lg-6">
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <button class="btn btn-accent" onclick="initRoles(this)">
+              <span class="btn-label">Initialise Role Tokens</span>
+            </button>
+            <span id="roles-status" style="color:var(--muted);font-size:0.83rem"></span>
+          </div>
+          <div class="d-flex gap-2 mb-3 flex-wrap">
+            <button class="btn btn-outline-accent role-btn active" id="role-btn-encrypt" onclick="selectRole('encrypt')">Encrypt Only</button>
+            <button class="btn btn-outline-accent role-btn" id="role-btn-decrypt" onclick="selectRole('decrypt')">Decrypt Only</button>
+            <button class="btn btn-outline-accent role-btn" id="role-btn-admin" onclick="selectRole('admin')">Key Admin</button>
+          </div>
+          <div class="policy-viewer">
+            <div class="policy-viewer-header">Active Policy — <span id="policy-name-label" style="color:var(--accent)">encrypt-only</span></div>
+            <pre id="policy-hcl">Loading...</pre>
+          </div>
+        </div>
 
-      <div class="d-flex gap-2 mb-3">
-        <button class="btn btn-outline-accent role-btn active" id="role-btn-encrypt" onclick="selectRole('encrypt')">Encrypt Only</button>
-        <button class="btn btn-outline-accent role-btn" id="role-btn-decrypt" onclick="selectRole('decrypt')">Decrypt Only</button>
-        <button class="btn btn-outline-accent role-btn" id="role-btn-admin" onclick="selectRole('admin')">Key Admin</button>
-      </div>
-
-      <!-- Policy viewer -->
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:1rem">
-        <div style="color:var(--muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Active Policy — <span id="policy-name-label" style="color:var(--accent)">encrypt-only</span></div>
-        <pre id="policy-hcl" style="margin:0;font-family:'SFMono-Regular',Consolas,monospace;font-size:0.78rem;color:var(--accent);white-space:pre-wrap;word-break:break-all">Loading...</pre>
-      </div>
-
-      <div class="row g-3">
-        <div class="col-md-5">
+        <!-- Right: token display + perm matrix + test -->
+        <div class="col-lg-6 d-flex flex-column gap-3">
+          <div class="stat-box">
+            <div class="stat-label">Active Role Token</div>
+            <div id="active-role-token" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;word-break:break-all;color:var(--muted);margin-top:0.35rem">Not initialised</div>
+          </div>
           <table class="table perm-table mb-0">
             <thead>
               <tr>
@@ -483,134 +669,142 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Encrypt</td>
-                <td><span id="perm-encrypt" class="perm-icon pending">○</span></td>
-              </tr>
-              <tr>
-                <td>Decrypt</td>
-                <td><span id="perm-decrypt" class="perm-icon pending">○</span></td>
-              </tr>
-              <tr>
-                <td>Rotate Key</td>
-                <td><span id="perm-rotate" class="perm-icon pending">○</span></td>
-              </tr>
+              <tr><td>Encrypt</td><td><span id="perm-encrypt" class="perm-icon pending">○</span></td></tr>
+              <tr><td>Decrypt</td><td><span id="perm-decrypt" class="perm-icon pending">○</span></td></tr>
+              <tr><td>Rotate Key</td><td><span id="perm-rotate" class="perm-icon pending">○</span></td></tr>
             </tbody>
           </table>
-        </div>
-        <div class="col-md-7">
-          <div id="role-token-display" class="result-box" style="color:var(--muted);min-height:80px">
-            <div class="label">ACTIVE ROLE TOKEN</div>
-            <div id="active-role-token" style="word-break:break-all;font-size:0.75rem">Not initialised</div>
+          <div>
+            <button class="btn btn-accent" onclick="testAllActions(this)">
+              <span class="btn-label">Test All Actions</span>
+            </button>
+          </div>
+          <div id="role-api" class="api-panel collapsed" style="margin-top:0">
+            <div class="api-panel-header" onclick="togglePanel('role-api')">
+              <span>API Call</span><span id="role-api-arrow">&#9660;</span>
+            </div>
+            <div class="api-panel-body"><pre id="role-curl"></pre></div>
           </div>
         </div>
-      </div>
-
-      <button class="btn btn-accent mt-3" onclick="testAllActions(this)">
-        <span class="btn-label">Test All Actions</span>
-      </button>
-
-      <div id="role-api" class="api-panel collapsed">
-        <div class="api-panel-header" onclick="togglePanel('role-api')">
-          <span>API Call</span><span id="role-api-arrow">&#9660;</span>
-        </div>
-        <div class="api-panel-body"><pre id="role-curl"></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- Step 5: Key Governance -->
+  <!-- Step 5: Control Group -->
   <div class="demo-card">
     <div class="card-header">
       <span class="step-badge">5</span>
-      <span class="card-title">Key Governance — Visibility, Export &amp; Control Groups</span>
+      <span class="card-title">Key Export — Control Group</span>
+      <span class="card-subtitle">/ Dual Approval Enforcement</span>
     </div>
     <div class="card-body">
 
-      <!-- 5a: Key metadata -->
-      <h6 style="color:var(--accent);margin-bottom:12px">Key Visibility</h6>
-      <div class="d-flex gap-2 mb-3">
-        <button class="btn btn-outline-accent btn-sm" onclick="loadKeyInfo('demo-key')">
-          <span class="btn-label">Inspect demo-key</span>
-        </button>
-        <button class="btn btn-outline-accent btn-sm" onclick="loadKeyInfo('demo-key-managed')">
-          <span class="btn-label">Inspect demo-key-managed</span>
-        </button>
+      <div class="concept-banner">
+        <strong>Why Control Groups?</strong><br>
+        Even an authorised operator cannot export key material unilaterally.
+        Vault's Control Group policy intercepts the request and issues a <em>wrapping token</em> — an opaque hold.
+        A separate custodian must approve before the operator can unwrap and collect the key.
+        This enforces four-eyes / dual-control without any application code.
       </div>
-      <div id="key-info-result" class="mb-3"></div>
 
-      <hr style="border-color:var(--border);margin:20px 0">
-
-      <!-- 5b: Export control -->
-      <h6 style="color:var(--accent);margin-bottom:12px">Export Control &amp; Control Group Workflow</h6>
-      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:12px">
-        <code style="color:var(--accent)">demo-key</code> is non-exportable.
-        <code style="color:var(--accent)">demo-key-managed</code> is exportable but requires custodian approval (Control Group).
-      </p>
-
-      <div class="d-flex gap-2 mb-3 flex-wrap">
-        <button class="btn btn-outline-accent btn-sm" onclick="attemptExport('demo-key')">
-          <span class="btn-label">Try Export demo-key</span>
-        </button>
-        <button class="btn btn-outline-accent btn-sm" onclick="attemptExport('demo-key-managed')">
-          <span class="btn-label">Request Export demo-key-managed</span>
-        </button>
-      </div>
-      <div id="export-result" class="mb-3"></div>
-
-      <!-- Control group approval flow (shown after export request) -->
-      <div id="cg-approval-flow" style="display:none">
-        <div style="background:rgba(246,201,14,0.08);border:1px solid #f6c90e;border-radius:8px;padding:16px;margin-bottom:12px">
-          <div style="color:#f6c90e;font-weight:600;margin-bottom:8px">⏳ Awaiting Custodian Approval</div>
-          <div style="font-size:0.82rem;color:var(--muted);margin-bottom:12px">
-            Wrapping token: <code id="cg-wrap-token-display" style="color:var(--text)"></code>
-          </div>
-          <div class="d-flex gap-2 align-items-center flex-wrap">
-            <input type="password" id="cg-custodian-password" class="form-control form-control-sm" style="max-width:200px" placeholder="Custodian password" value="custodian123">
-            <button class="btn btn-sm" style="background:#f6c90e;color:#111;font-weight:600" onclick="custodianApprove()">
-              <span class="btn-label">Custodian Approve</span>
-            </button>
-          </div>
+      <!-- Actor flow -->
+      <div class="actor-flow">
+        <div class="actor-box actor-operator">
+          <div class="actor-name">Operator</div>
+          <div class="actor-role">key-exporter policy</div>
         </div>
-        <div id="cg-approve-result"></div>
+        <div class="actor-arrow">
+          <div class="actor-arrow-line"></div>
+          <div class="actor-arrow-label">requests export</div>
+        </div>
+        <div class="actor-box actor-vault">
+          <div class="actor-name">Vault</div>
+          <div class="actor-role">issues wrap token (hold)</div>
+        </div>
+        <div class="actor-arrow">
+          <div class="actor-arrow-line"></div>
+          <div class="actor-arrow-label">approves</div>
+        </div>
+        <div class="actor-box actor-custodian">
+          <div class="actor-name">Custodian</div>
+          <div class="actor-role">key-custodian policy</div>
+        </div>
+        <div class="actor-arrow">
+          <div class="actor-arrow-line"></div>
+          <div class="actor-arrow-label">unwraps</div>
+        </div>
+        <div class="actor-box actor-operator">
+          <div class="actor-name">Operator</div>
+          <div class="actor-role">collects key material</div>
+        </div>
+      </div>
 
-        <div id="cg-unwrap-flow" style="display:none;margin-top:12px">
-          <button class="btn btn-accent btn-sm" onclick="requestorUnwrap()">
-            <span class="btn-label">Unwrap — Complete Export</span>
+      <!-- Phase 1 -->
+      <div class="phase-block phase-operator">
+        <div class="phase-header">
+          <span>Phase 1 — Operator Requests Export</span>
+          <span class="token-pill tp-yellow ms-auto">key-exporter</span>
+        </div>
+        <div class="phase-body">
+          <p style="color:var(--text-2);font-size:0.83rem;margin-bottom:12px">
+            The operator holds a token scoped to export. Vault accepts the request but does not return key material —
+            instead it returns a <strong style="color:var(--text)">wrapping token</strong> that acts as a pending hold.
+          </p>
+          <button class="btn btn-outline-accent btn-sm" onclick="attemptExport('demo-key-managed')">
+            <span class="btn-label">Request Export of demo-key-managed</span>
           </button>
-          <div id="cg-unwrap-result" class="mt-2"></div>
+          <div id="export-result" class="mt-2"></div>
         </div>
       </div>
 
-      <div id="gov-api" class="api-panel collapsed mt-2">
+      <!-- Phase 2 (revealed after wrap token issued) -->
+      <div id="cg-approval-flow" style="display:none">
+        <div class="phase-block phase-custodian">
+          <div class="phase-header">
+            <span>Phase 2 — Custodian Approves</span>
+            <span class="token-pill tp-red ms-auto">key-custodian / userpass</span>
+          </div>
+          <div class="phase-body">
+            <p style="color:var(--text-2);font-size:0.83rem;margin-bottom:10px">
+              A separate identity — the custodian — authenticates and authorises the pending wrap token.
+              The operator's request remains on hold until this step is completed.<br>
+              <span style="color:var(--text-2)">Wrap token: </span><code id="cg-wrap-token-display" style="color:var(--muted);font-size:0.75rem"></code>
+            </p>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+              <input type="password" id="cg-custodian-password" class="form-control form-control-sm" style="max-width:200px" placeholder="Custodian password" value="custodian123">
+              <button class="btn btn-sm" style="background:#ef4444;border:none;color:#fff;font-weight:600;border-radius:8px" onclick="custodianApprove()">
+                <span class="btn-label">Custodian Approve</span>
+              </button>
+            </div>
+            <div id="cg-approve-result" class="mt-2"></div>
+          </div>
+        </div>
+
+        <!-- Phase 3 (revealed after approval) -->
+        <div id="cg-unwrap-flow" style="display:none">
+          <div class="phase-block phase-collect">
+            <div class="phase-header">
+              <span>Phase 3 — Operator Collects Key Material</span>
+              <span class="token-pill tp-yellow ms-auto">key-exporter (original requestor)</span>
+            </div>
+            <div class="phase-body">
+              <p style="color:var(--text-2);font-size:0.83rem;margin-bottom:10px">
+                Custodian approval is recorded in Vault. The operator presents the same wrap token — Vault verifies the approval count is met and releases the key material.
+              </p>
+              <button class="btn btn-accent btn-sm" onclick="requestorUnwrap()">
+                <span class="btn-label">Unwrap — Collect Key Material</span>
+              </button>
+              <div id="cg-unwrap-result" class="mt-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="gov-api" class="api-panel collapsed mt-1">
         <div class="api-panel-header" onclick="togglePanel('gov-api')">
           <span>API Call</span><span id="gov-api-arrow">&#9660;</span>
         </div>
         <div class="api-panel-body"><pre id="gov-curl"></pre></div>
-      </div>
-
-      <hr style="border-color:var(--border);margin:20px 0">
-
-      <!-- 5c: Deletion control -->
-      <h6 style="color:var(--accent);margin-bottom:12px">Deletion Control</h6>
-      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:12px">
-        <code style="color:var(--accent)">demo-key</code> has <code>deletion_allowed=false</code> — protected permanently.
-        <code style="color:var(--accent)">demo-key-managed</code> has <code>deletion_allowed=true</code>.
-      </p>
-      <div class="d-flex gap-2 flex-wrap">
-        <button class="btn btn-outline-accent btn-sm" onclick="attemptDelete('demo-key')">
-          <span class="btn-label">Try Delete demo-key</span>
-        </button>
-        <button class="btn btn-sm" style="background:#f85149;border:none;color:#fff;font-weight:600" onclick="attemptDelete('demo-key-managed')">
-          <span class="btn-label">Delete demo-key-managed</span>
-        </button>
-      </div>
-      <div id="delete-result" class="mt-3"></div>
-      <div id="del-api" class="api-panel collapsed mt-2">
-        <div class="api-panel-header" onclick="togglePanel('del-api')">
-          <span>API Call</span><span id="del-api-arrow">&#9660;</span>
-        </div>
-        <div class="api-panel-body"><pre id="del-curl"></pre></div>
       </div>
 
     </div>
@@ -624,7 +818,6 @@
 let rootToken = '';
 let roleTokens = { encryptOnly: '', decryptOnly: '', keyAdmin: '' };
 let selectedRole = 'encrypt'; // encrypt | decrypt | admin
-let allRecords = [];
 
 // ─── Token input ────────────────────────────────────────────────────────────
 document.getElementById('root-token-input').addEventListener('input', function() {
@@ -641,13 +834,14 @@ function toggleTokenVisibility() {
 
 // ─── Utilities ──────────────────────────────────────────────────────────────
 function setLoading(btn, loading) {
-  const label = btn.querySelector('.btn-label');
   if (loading) {
+    const label = btn.querySelector('.btn-label');
+    btn.dataset.label = label ? label.textContent : btn.textContent.trim();
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Working...';
   } else {
     btn.disabled = false;
-    btn.innerHTML = `<span class="btn-label">${label ? label.textContent : btn.dataset.label || 'Go'}</span>`;
+    btn.innerHTML = `<span class="btn-label">${btn.dataset.label || ''}</span>`;
   }
 }
 
@@ -680,10 +874,7 @@ function truncate(str, n) {
 }
 
 // ─── Step 0: Status ──────────────────────────────────────────────────────────
-async function checkStatus(btn) {
-  const origLabel = btn.querySelector('.btn-label').textContent;
-  btn.dataset.label = origLabel;
-  setLoading(btn, true);
+async function checkStatus() {
   try {
     const r = await fetch('/api/status');
     const d = await r.json();
@@ -698,8 +889,6 @@ async function checkStatus(btn) {
     }
     document.getElementById('s-storage').textContent = d.storage_type || '—';
     showCurl('status-api', 'status-curl', d.curl);
-
-    // Update navbar badge
     const badge = document.getElementById('hsm-badge');
     if (d.sealed === false) {
       badge.className = 'hsm-badge connected';
@@ -708,145 +897,76 @@ async function checkStatus(btn) {
       badge.className = 'hsm-badge sealed';
       badge.innerHTML = '&#9679; Sealed';
     }
-  } catch (e) {
-    showResult('s-seal-type', 'Error: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-    btn.querySelector('.btn-label').textContent = origLabel;
-  }
+  } catch (e) { /* silently ignore — status will just show dashes */ }
 }
 
-// ─── Base64 preview ──────────────────────────────────────────────────────────
-function updateBase64Preview() {
-  const name = document.getElementById('enc-name').value.trim() || 'Jane Smith';
-  const clearance = document.getElementById('enc-clearance').value || 'SECRET';
-  const id = document.getElementById('enc-id').value.trim() || 'EMP-001';
-  const record = JSON.stringify({ name, clearance, id });
-  document.getElementById('b64-original').textContent = record;
-  document.getElementById('b64-encoded').textContent = btoa(unescape(encodeURIComponent(record)));
-}
-document.getElementById('enc-name').addEventListener('input', updateBase64Preview);
-document.getElementById('enc-clearance').addEventListener('change', updateBase64Preview);
-document.getElementById('enc-id').addEventListener('input', updateBase64Preview);
-updateBase64Preview();
 
-// ─── Step 1: Encrypt ─────────────────────────────────────────────────────────
-async function encryptRecord(btn) {
+// ─── Section 2: Insert with FPE ──────────────────────────────────────────────
+async function encryptAndInsert(btn) {
   if (!rootToken) { alert('Enter a Vault token first.'); return; }
   const name = document.getElementById('enc-name').value.trim();
-  const clearance = document.getElementById('enc-clearance').value;
-  const id = document.getElementById('enc-id').value.trim();
-  if (!name || !id) { alert('Fill in Name and Employee ID.'); return; }
+  const dept = document.getElementById('enc-dept').value;
+  const tfn = document.getElementById('enc-tfn').value.replace(/\D/g, '').substring(0, 9);
+  if (!name || tfn.length !== 9) { alert('Fill in Name and a 9-digit TFN.'); return; }
 
-  btn.dataset.label = btn.querySelector('.btn-label').textContent;
   setLoading(btn, true);
   try {
-    const r = await fetch('/api/encrypt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: rootToken, record: { name, clearance, id } })
-    });
-    const d = await r.json();
-    if (d.error) {
-      showResult('enc-result', 'Error: ' + JSON.stringify(d.error), 'error');
-    } else {
-      showResult('enc-result',
-        `<div class="label">RECORD ID</div><div>${d.record_id}</div>` +
-        `<div class="label mt-2">CIPHERTEXT</div>` +
-        `<div title="${d.ciphertext}" style="word-break:break-all">${d.ciphertext}</div>`,
-        'success');
-      loadRecords();
+    const [nameResp, deptResp, tfnResp] = await Promise.all([
+      fetch('/api/transform/encode', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: rootToken, value: name, transformation: 'emp-name'})
+      }).then(r => r.json()),
+      fetch('/api/transform/encode', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: rootToken, value: dept, transformation: 'emp-dept'})
+      }).then(r => r.json()),
+      fetch('/api/transform/encode', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: rootToken, value: tfn, transformation: 'tfn'})
+      }).then(r => r.json())
+    ]);
+    showCurl('enc-api', 'enc-curl', tfnResp.curl || nameResp.curl || '');
+    if (nameResp.error || deptResp.error || tfnResp.error) {
+      showResult('enc-result', '✗ ' + (nameResp.error || deptResp.error || tfnResp.error), 'error');
+      return;
     }
-    showCurl('enc-api', 'enc-curl', d.curl);
+    const nextId = dbRecords.length + 1;
+    dbRecords.push({ id: nextId, name, dept, tfn });
+    dbEncryptedNames[nextId] = nameResp.encoded;
+    dbEncryptedDepts[nextId] = deptResp.encoded;
+    dbEncryptedTfns[nextId] = tfnResp.encoded;
+    renderDbTable();
+    showResult('enc-result',
+      `<div class="label">NEW ROW INSERTED</div>` +
+      `<div style="color:var(--text)">${name} — ${dept}</div>` +
+      `<div class="label mt-2">TFN FPE-ENCODED AS</div>` +
+      `<div style="color:var(--accent)">${tfnResp.encoded}</div>`,
+      'success');
   } catch (e) {
     showResult('enc-result', 'Error: ' + e.message, 'error');
   } finally {
     setLoading(btn, false);
-    btn.querySelector('.btn-label').textContent = 'Encrypt & Store';
-  }
-}
-
-// ─── Step 2: Records ─────────────────────────────────────────────────────────
-async function loadRecords() {
-  try {
-    const r = await fetch('/api/records');
-    allRecords = await r.json();
-    renderRecords();
-  } catch (e) {
-    console.error('loadRecords:', e);
-  }
-}
-
-function renderRecords() {
-  const tbody = document.getElementById('records-tbody');
-  if (!allRecords.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:var(--muted);padding:2rem">No records yet</td></tr>';
-    return;
-  }
-  tbody.innerHTML = allRecords.map(rec => `
-    <tr id="rec-row-${rec.id}">
-      <td><code style="color:var(--accent)">${rec.id}</code></td>
-      <td style="color:var(--muted);font-size:0.8rem">${fmtTs(rec.timestamp)}</td>
-      <td class="cipher-cell" title="${rec.ciphertext}">${truncate(rec.ciphertext, 40)}</td>
-      <td>
-        <button class="btn btn-sm btn-outline-accent" onclick="decryptRow('${rec.id}', this)">Decrypt</button>
-      </td>
-    </tr>
-    <tr id="plain-row-${rec.id}" style="display:none">
-      <td colspan="4" class="plaintext-row">
-        <span style="color:var(--muted);font-size:0.75rem">PLAINTEXT: </span>
-        <code id="plain-val-${rec.id}" style="color:var(--success)"></code>
-      </td>
-    </tr>
-  `).join('');
-}
-
-async function decryptRow(recordId, btn) {
-  if (!rootToken) { alert('Enter a Vault token first.'); return; }
-  const orig = btn.textContent;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-  try {
-    const r = await fetch(`/api/decrypt/${recordId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: rootToken })
-    });
-    const d = await r.json();
-    showCurl('dec-api', 'dec-curl', d.curl);
-    if (d.error) {
-      showCurl('dec-api', 'dec-curl', d.curl);
-      btn.textContent = 'Error';
-      btn.classList.add('btn-danger');
-    } else {
-      document.getElementById('plain-val-' + recordId).textContent = d.plaintext;
-      const plainRow = document.getElementById('plain-row-' + recordId);
-      plainRow.style.display = '';
-      btn.textContent = 'Hide';
-      btn.onclick = () => {
-        plainRow.style.display = 'none';
-        btn.textContent = 'Decrypt';
-        btn.onclick = () => decryptRow(recordId, btn);
-      };
-    }
-  } catch (e) {
-    btn.textContent = 'Error';
-  } finally {
-    btn.disabled = false;
-    if (btn.textContent !== 'Hide' && btn.textContent !== 'Error') btn.textContent = orig;
   }
 }
 
 // ─── Step 3: Key Rotation ────────────────────────────────────────────────────
+let transitTestCipher = '';
+let transitOldCipher  = '';
+
 async function rotateKey(btn) {
   if (!rootToken) { alert('Enter a Vault token first.'); return; }
-  btn.dataset.label = btn.querySelector('.btn-label').textContent;
   setLoading(btn, true);
   document.getElementById('rot-result').innerHTML = '';
   try {
+    // Capture a test cipher at the current key version before rotating
+    const encR = await fetch('/api/transit/encrypt-field', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token: rootToken, value: 'demo-test-value'})
+    }).then(r => r.json());
+    if (encR.ciphertext) transitTestCipher = encR.ciphertext;
+
     const r = await fetch('/api/rotate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ token: rootToken })
     });
     const d = await r.json();
@@ -859,7 +979,8 @@ async function rotateKey(btn) {
       showResult('rot-result',
         `<div class="label">KEY ROTATED</div>` +
         `<div>Latest version: <strong style="color:var(--accent)">${d.latest_version}</strong> &nbsp;|&nbsp; ` +
-        `Min decrypt version: <strong style="color:var(--accent)">${d.min_decryption_version}</strong></div>`,
+        `Min decrypt version: <strong style="color:var(--accent)">${d.min_decryption_version}</strong></div>` +
+        (transitTestCipher ? `<div class="mt-2" style="color:var(--muted);font-size:0.82rem">Test cipher captured at v${d.latest_version - 1}: <code style="color:var(--warning)">${transitTestCipher.substring(0, 32)}…</code></div>` : ''),
         'success');
       document.getElementById('backcompat-btn').disabled = false;
     }
@@ -867,38 +988,118 @@ async function rotateKey(btn) {
     showResult('rot-result', 'Error: ' + e.message, 'error');
   } finally {
     setLoading(btn, false);
-    btn.querySelector('.btn-label').textContent = 'Rotate Key';
   }
 }
 
 async function verifyBackcompat(btn) {
   if (!rootToken) { alert('Enter a Vault token first.'); return; }
-  if (!allRecords.length) { alert('No records to decrypt. Encrypt something in Step 1 first.'); return; }
-  btn.dataset.label = btn.querySelector('.btn-label').textContent;
+  if (!transitTestCipher) { alert('Rotate the key first — a test cipher will be captured automatically.'); return; }
   setLoading(btn, true);
   try {
-    const oldest = allRecords[0];
-    const r = await fetch(`/api/decrypt/${oldest.id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: rootToken })
+    const r = await fetch('/api/transit/decrypt-field', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ token: rootToken, ciphertext: transitTestCipher })
     });
     const d = await r.json();
     showCurl('rot-api', 'rot-curl', d.curl);
     if (d.error) {
-      showResult('rot-result', 'Backward compat FAILED: ' + JSON.stringify(d.error), 'error');
+      showResult('rot-result', 'Backward compat FAILED: ' + d.error, 'error');
     } else {
       showResult('rot-result',
         `<div class="label">BACKWARD COMPATIBILITY VERIFIED</div>` +
-        `<div>Decrypted oldest record (${oldest.id}) with current key:</div>` +
-        `<div style="margin-top:0.4rem;word-break:break-all">${d.plaintext}</div>`,
+        `<div>Pre-rotation ciphertext decrypted successfully with the current key version.</div>` +
+        `<div style="margin-top:0.4rem">Value: <strong style="color:var(--success)">${d.plaintext}</strong></div>`,
         'success');
     }
   } catch (e) {
     showResult('rot-result', 'Error: ' + e.message, 'error');
   } finally {
     setLoading(btn, false);
-    btn.querySelector('.btn-label').textContent = 'Verify Backward Compat';
+  }
+}
+
+async function rewrapAll(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  if (!transitTestCipher) { alert('Rotate the key first to create a test cipher.'); return; }
+  setLoading(btn, true);
+  transitOldCipher = transitTestCipher;
+  try {
+    const r = await fetch('/api/transit/rewrap-batch', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token: rootToken, ciphertexts: [transitTestCipher]})
+    });
+    const d = await r.json();
+    showCurl('rewrap-api', 'rewrap-curl', d.curl || '');
+    if (d.error) { showResult('rewrap-result', '✗ Rewrap failed: ' + d.error, 'error'); return; }
+    transitTestCipher = d.rewrapped[0];
+    showResult('rewrap-result',
+      `<div class="label">REWRAPPED</div>` +
+      `<div>Ciphertext re-encrypted to the current key version:</div>` +
+      `<div style="word-break:break-all;color:var(--warning);margin-top:0.4rem">${transitTestCipher}</div>`,
+      'success');
+    document.getElementById('btn-retire').disabled = false;
+  } catch (e) {
+    showResult('rewrap-result', 'Error: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+async function retireOldVersions(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  setLoading(btn, true);
+  try {
+    const keyR = await fetch('/api/rotate', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token: rootToken})
+    });
+    const keyD = await keyR.json();
+    const latest = keyD.latest_version || 1;
+    const r = await fetch('/api/retire-version', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token: rootToken, min_decryption_version: latest})
+    });
+    const d = await r.json();
+    showCurl('rewrap-api', 'rewrap-curl', d.curl || '');
+    if (d.error) { showResult('rewrap-result', '✗ Retire failed: ' + d.error, 'error'); return; }
+    document.getElementById('kv-latest').textContent = d.latest_version || '—';
+    document.getElementById('kv-min').textContent = d.min_decryption_version || '—';
+    showResult('rewrap-result',
+      `<div class="label">OLD VERSIONS RETIRED</div>` +
+      `<div>min_decryption_version set to <strong style="color:var(--accent)">v${d.min_decryption_version}</strong>. Any ciphertext below that version is now permanently rejected.</div>`,
+      'success');
+    document.getElementById('btn-try-old').disabled = false;
+  } catch (e) {
+    showResult('rewrap-result', 'Error: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+async function tryRetiredCipher(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  if (!transitOldCipher) { alert('No old cipher saved — run Rewrap first.'); return; }
+  setLoading(btn, true);
+  try {
+    const r = await fetch('/api/transit/decrypt-field', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token: rootToken, ciphertext: transitOldCipher})
+    });
+    const d = await r.json();
+    showCurl('rewrap-api', 'rewrap-curl', d.curl);
+    if (d.error) {
+      showResult('rewrap-result',
+        `<div class="label">OLD CIPHER REJECTED ✓</div>` +
+        `<div>Vault refused to decrypt the pre-rewrap ciphertext — its key version has been retired.</div>` +
+        `<div style="margin-top:0.6rem;padding:0.5rem 0.75rem;background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.3);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--danger)">${d.error}</div>`,
+        'error');
+    } else {
+      showResult('rewrap-result', '⚠ Unexpected: old cipher still decrypted — check min_decryption_version', 'error');
+    }
+  } catch (e) {
+    showResult('rewrap-result', 'Error: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
   }
 }
 
@@ -1016,12 +1217,187 @@ async function testAllActions(btn) {
   btn.querySelector('.btn-label').textContent = 'Test All Actions';
 }
 
+// ─── Section 1: DB Encryption (FPE) ──────────────────────────────────────────
+const dbRecords = [
+  { id: 1, name: 'Alice Chen',  dept: 'Finance',     tfn: '123456789' },
+  { id: 2, name: 'Bob Smith',   dept: 'Operations',  tfn: '987654321' },
+  { id: 3, name: 'Carol White', dept: 'Engineering', tfn: '456789123' },
+  { id: 4, name: 'David Lee',   dept: 'Legal',       tfn: '789123456' },
+  { id: 5, name: 'Emma Brown',  dept: 'Finance',     tfn: '321654987' },
+];
+const dbEncryptedTfns = {};
+const dbEncryptedNames = {};
+const dbEncryptedDepts = {};
+
+function renderDbTable() {
+  const tbody = document.getElementById('db-tbody');
+  tbody.innerHTML = dbRecords.map(r => {
+    const encName = dbEncryptedNames[r.id];
+    const encDept = dbEncryptedDepts[r.id];
+    const encTfn  = dbEncryptedTfns[r.id];
+    const nameCell = encName
+      ? `<code style="color:var(--accent)">${encName}</code>`
+      : `<span style="color:var(--danger)">${r.name}</span>`;
+    const deptCell = encDept
+      ? `<code style="color:var(--accent)">${encDept}</code>`
+      : `<span style="color:var(--danger)">${r.dept}</span>`;
+    const tfnCell = encTfn
+      ? `<code style="color:var(--accent)">${encTfn}</code>`
+      : `<span style="color:var(--danger)">${r.tfn}</span>`;
+    const statusCell = (encName && encDept && encTfn)
+      ? `<span style="color:var(--success);font-size:0.78rem">✓ FPE encrypted</span>`
+      : `<span style="color:var(--warning);font-size:0.78rem">⚠ plaintext</span>`;
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:6px 10px;color:var(--muted)">${r.id}</td>
+      <td style="padding:6px 10px">${nameCell}</td>
+      <td style="padding:6px 10px">${deptCell}</td>
+      <td style="padding:6px 10px">${tfnCell}</td>
+      <td style="padding:6px 10px">${statusCell}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function initTransform(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  setLoading(btn, true);
+  const r = await fetch('/api/transform/init', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({token: rootToken})
+  });
+  const d = await r.json();
+  setLoading(btn, false);
+  const el = document.getElementById('transform-init-result');
+  if (d.allowed) {
+    el.innerHTML = '<span class="text-success">✓ Transform engine ready — FPE transformation configured for 9-digit TFN</span>';
+    document.getElementById('btn-encrypt-table').disabled = false;
+  } else {
+    el.innerHTML = `<span class="text-danger">✗ Init failed: ${d.error || JSON.stringify(d)}</span>`;
+  }
+}
+
+async function encryptTable(btn) {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  setLoading(btn, true);
+  const el = document.getElementById('encrypt-table-result');
+  try {
+    const [nameResp, deptResp, tfnResp] = await Promise.all([
+      fetch('/api/transform/batch-encode', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: rootToken, values: dbRecords.map(r => r.name), transformation: 'emp-name'})
+      }).then(r => r.json()),
+      fetch('/api/transform/batch-encode', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: rootToken, values: dbRecords.map(r => r.dept), transformation: 'emp-dept'})
+      }).then(r => r.json()),
+      fetch('/api/transform/batch-encode', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: rootToken, values: dbRecords.map(r => r.tfn), transformation: 'tfn'})
+      }).then(r => r.json())
+    ]);
+    if (nameResp.error || deptResp.error || tfnResp.error) {
+      el.innerHTML = `<span class="text-danger">✗ ${nameResp.error || deptResp.error || tfnResp.error}</span>`;
+      return;
+    }
+    dbRecords.forEach((rec, i) => {
+      dbEncryptedNames[rec.id] = nameResp.encoded[i];
+      dbEncryptedDepts[rec.id] = deptResp.encoded[i];
+      dbEncryptedTfns[rec.id] = tfnResp.encoded[i];
+    });
+    renderDbTable();
+    showCurl('transform-api', 'transform-curl', tfnResp.curl || '');
+    el.innerHTML = '<span class="text-success">✓ 5 rows encrypted — Name + Department + TFN via Vault Transform FPE, format preserved, no schema change</span>';
+    document.getElementById('fpe-search-panel').style.display = 'block';
+    document.getElementById('search-panel-placeholder').style.display = 'none';
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+function updateSearchHint() {
+  const type = document.getElementById('search-type').value;
+  const input = document.getElementById('search-value');
+  if (type === 'tfn') {
+    input.placeholder = 'e.g. 456789123';
+    input.maxLength = 9;
+    input.inputMode = 'numeric';
+  } else if (type === 'name') {
+    input.placeholder = 'e.g. Alice Chen';
+    input.maxLength = 64;
+    input.inputMode = 'text';
+  } else {
+    input.placeholder = 'e.g. Finance';
+    input.maxLength = 32;
+    input.inputMode = 'text';
+  }
+  input.value = '';
+}
+
+async function searchEncrypted() {
+  if (!rootToken) { alert('Enter a Vault token first.'); return; }
+  const searchType = document.getElementById('search-type').value;
+  const rawValue = document.getElementById('search-value').value.trim();
+  const el = document.getElementById('search-result');
+  if (!rawValue) { el.innerHTML = '<span class="text-danger">Enter a search value</span>'; return; }
+  if (searchType === 'tfn' && !/^\d{9}$/.test(rawValue)) {
+    el.innerHTML = '<span class="text-danger">TFN must be exactly 9 digits</span>'; return;
+  }
+
+  const transformation = searchType === 'tfn' ? 'tfn' : searchType === 'name' ? 'emp-name' : 'emp-dept';
+  const encMap = searchType === 'tfn' ? dbEncryptedTfns : searchType === 'name' ? dbEncryptedNames : dbEncryptedDepts;
+  const colLabel = searchType === 'tfn' ? 'tfn_enc' : searchType === 'name' ? 'name_enc' : 'dept_enc';
+
+  const r = await fetch('/api/transform/encode', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({token: rootToken, value: rawValue, transformation})
+  });
+  const d = await r.json();
+  showCurl('search-api', 'search-curl', d.curl || '');
+  if (!d.encoded) {
+    el.innerHTML = `<span class="text-danger">✗ Encode failed: ${d.error || 'unknown'}</span>`;
+    return;
+  }
+  const encValue = d.encoded;
+  const matchEntries = Object.entries(encMap).filter(([, enc]) => enc === encValue);
+  const matchRecords = matchEntries.map(([id]) => dbRecords.find(r => r.id === parseInt(id))).filter(Boolean);
+  const plainField = searchType === 'tfn' ? 'tfn' : searchType === 'name' ? 'name' : 'dept';
+  el.innerHTML =
+    `<div style="background:var(--surface);border:1px solid var(--border-2);border-radius:8px;padding:12px 14px;margin-top:8px;font-size:0.85rem">` +
+    `<div style="color:var(--muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">3-step query pattern</div>` +
+    `<div style="margin-bottom:8px">` +
+      `<span style="color:var(--muted)">① Vault encodes search term:</span><br>` +
+      `<code style="color:var(--text-2)">${rawValue}</code> → <code style="color:var(--accent)">${encValue}</code>` +
+      `<span style="color:var(--muted);font-size:0.78rem;margin-left:8px">(deterministic — always same)</span>` +
+    `</div>` +
+    `<div style="margin-bottom:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:monospace;font-size:0.82rem;color:var(--text-2)">` +
+      `② SELECT * FROM employees<br>&nbsp;&nbsp;&nbsp;WHERE ${colLabel} = <span style="color:var(--accent)">'${encValue}'</span>` +
+    `</div>` +
+    (matchRecords.length > 0
+      ? `<div style="color:var(--success)">③ ${matchRecords.length} row${matchRecords.length > 1 ? 's' : ''} found:<br>` +
+        matchRecords.map(rec => `&nbsp;&nbsp;<strong>${rec.name}</strong> (${rec.dept}) — plaintext: <code style="color:var(--text)">${rec[plainField]}</code>`).join('<br>') +
+        `</div>`
+      : `<div style="color:var(--warning)">③ No matching rows found in this table</div>`
+    ) +
+    `</div>`;
+}
+
 // ─── Init ────────────────────────────────────────────────────────────────────
-checkStatus(document.querySelector('[onclick="checkStatus(this)"]'));
-loadRecords();
+(async () => {
+  renderDbTable();
+  try {
+    const r = await fetch('/api/auto-token');
+    const d = await r.json();
+    if (d.token) {
+      document.getElementById('root-token-input').value = d.token;
+      rootToken = d.token;
+      loadPolicy(selectedRole);
+    }
+  } catch (e) { /* no init file — user must paste manually */ }
+  checkStatus();
+})();
 
 // ─── Step 5: Key Governance ───────────────────────────────────────────────────
 let cgWrapToken = '';
+let cgWrapAccessor = '';
 let cgRequestorToken = '';
 let cgCustodianToken = '';
 
@@ -1029,13 +1405,13 @@ async function loadKeyInfo(keyName) {
   if (!rootToken) { alert('Enter a Vault token first.'); return; }
   const r = await fetch(`/api/key-info/${keyName}?token=${encodeURIComponent(rootToken)}`);
   const d = await r.json();
-  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  showCurl('gov-api', 'gov-curl', d.curl || '');
   const el = document.getElementById('key-info-result');
   if (d.error) { el.innerHTML = `<span class="text-danger">${JSON.stringify(d.error)}</span>`; return; }
   el.innerHTML = `
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:0.85rem">
+    <div style="background:var(--surface);border:1px solid var(--border-2);border-radius:8px;padding:12px 16px;font-size:0.85rem">
       <div style="margin-bottom:6px"><strong style="color:var(--text)">${d.name}</strong></div>
-      <div class="d-flex gap-4">
+      <div class="d-flex gap-4 flex-wrap">
         <span>Exportable: <strong style="color:${d.exportable ? 'var(--success)' : 'var(--danger)'}">${d.exportable}</strong></span>
         <span>Deletion Allowed: <strong style="color:${d.deletion_allowed ? 'var(--success)' : 'var(--danger)'}">${d.deletion_allowed}</strong></span>
         <span>Latest Version: <strong style="color:var(--accent)">v${d.latest_version}</strong></span>
@@ -1045,15 +1421,28 @@ async function loadKeyInfo(keyName) {
 
 async function attemptExport(keyName) {
   if (!rootToken) { alert('Enter a Vault token first.'); return; }
-  // For demo-key-managed use a key-exporter scoped token via root
-  const tokenResp = await fetch('/api/init-roles', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({token: rootToken})
-  });
-  const tokens = await tokenResp.json();
 
-  const useToken = keyName === 'demo-key-managed' ? (tokens.key_exporter || rootToken) : rootToken;
+  let useToken = rootToken;
+  if (keyName === 'demo-key-managed') {
+    // Must use a key-exporter scoped token — root token bypasses Control Group
+    try {
+      const tr = await fetch('/api/token/create/key-exporter', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: rootToken})
+      });
+      const td = await tr.json();
+      if (!td.token) {
+        document.getElementById('export-result').innerHTML =
+          `<span class="text-danger">✗ Could not create key-exporter token — run scripts/init.sh first (${td.error || 'unknown error'})</span>`;
+        return;
+      }
+      useToken = td.token;
+    } catch (e) {
+      document.getElementById('export-result').innerHTML = `<span class="text-danger">✗ Error: ${e.message}</span>`;
+      return;
+    }
+  }
   cgRequestorToken = useToken;
 
   const r = await fetch('/api/export-key', {
@@ -1062,17 +1451,29 @@ async function attemptExport(keyName) {
     body: JSON.stringify({token: useToken, key_name: keyName})
   });
   const d = await r.json();
-  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  showCurl('gov-api', 'gov-curl', d.curl || '');
   const el = document.getElementById('export-result');
   const cgFlow = document.getElementById('cg-approval-flow');
 
   if (d.allowed) {
-    el.innerHTML = `<span class="text-success">✓ Export successful — key material returned</span>`;
+    el.innerHTML = `<span class="text-success">✓ Export successful — key material returned (no Control Group on this key)</span>`;
     cgFlow.style.display = 'none';
   } else if (d.control_group) {
     cgWrapToken = d.wrap_token;
-    el.innerHTML = `<span style="color:#f6c90e">⏳ Control group required — request held pending custodian approval</span>`;
-    document.getElementById('cg-wrap-token-display').textContent = d.wrap_token.substring(0, 20) + '...';
+    cgWrapAccessor = d.wrap_accessor || '';
+    const wi = d.wrap_info || {};
+    const wiDisplay = JSON.stringify({
+      token: (wi.token || '').substring(0, 20) + '…',
+      accessor: wi.accessor || '',
+      ttl: wi.ttl,
+      creation_path: wi.creation_path,
+    }, null, 2);
+    el.innerHTML =
+      `<span style="color:#f5c90e">⏳ Control Group intercepted — Vault issued a wrapping token. No key material returned.</span>` +
+      `<div style="margin-top:8px;background:var(--surface);border:1px solid rgba(245,201,14,0.28);border-radius:8px;padding:10px 12px">` +
+      `<div style="font-size:0.68rem;color:#f5c90e;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600">Vault response — wrap_info (not key data)</div>` +
+      `<pre style="margin:0;font-size:0.78rem;color:var(--text);white-space:pre-wrap;font-family:'JetBrains Mono',monospace">${wiDisplay}</pre></div>`;
+    document.getElementById('cg-wrap-token-display').textContent = (d.wrap_token || '').substring(0, 28) + '...';
     cgFlow.style.display = 'block';
     document.getElementById('cg-unwrap-flow').style.display = 'none';
     document.getElementById('cg-approve-result').innerHTML = '';
@@ -1101,13 +1502,32 @@ async function custodianApprove() {
   const r = await fetch('/api/control-group/approve', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({custodian_token: cgCustodianToken, wrap_token: cgWrapToken})
+    body: JSON.stringify({custodian_token: cgCustodianToken, wrap_accessor: cgWrapAccessor})
   });
   const d = await r.json();
-  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  showCurl('gov-api', 'gov-curl', d.curl || '');
   const el = document.getElementById('cg-approve-result');
   if (d.allowed) {
-    el.innerHTML = '<span class="text-success">✓ Custodian approved — requestor can now unwrap</span>';
+    const rd = d.request_data || {};
+    const auths = (rd.authorizations || []).map(a => ({
+      entity_id: a.entity_id || '(userpass)',
+      creation_time: a.creation_time,
+    }));
+    const checkDisplay = JSON.stringify({
+      approved: rd.approved,
+      request_entity: rd.request_entity ? { name: rd.request_entity.name } : undefined,
+      authorizations: auths,
+    }, null, 2);
+    el.innerHTML =
+      `<span class="text-success">✓ Custodian approved</span>` +
+      `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">` +
+      `<div style="flex:1;min-width:160px;background:var(--surface);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:10px 12px">` +
+      `<div style="font-size:0.68rem;color:var(--success);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600">sys/control-group/authorize → HTTP 200</div>` +
+      `<pre style="margin:0;font-size:0.78rem;color:var(--muted);font-family:'JetBrains Mono',monospace">${JSON.stringify(d.authorize_response ?? {}, null, 2)}</pre>` +
+      `<div style="font-size:0.7rem;color:var(--muted);margin-top:4px">Empty object = success (no error key)</div></div>` +
+      `<div style="flex:2;min-width:220px;background:var(--surface);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:10px 12px">` +
+      `<div style="font-size:0.68rem;color:var(--success);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600">sys/control-group/request → approval status</div>` +
+      `<pre style="margin:0;font-size:0.78rem;color:var(--text);white-space:pre-wrap;font-family:'JetBrains Mono',monospace">${checkDisplay}</pre></div></div>`;
     document.getElementById('cg-unwrap-flow').style.display = 'block';
   } else {
     el.innerHTML = `<span class="text-danger">✗ Approval failed: ${d.error || 'unknown'}</span>`;
@@ -1118,15 +1538,22 @@ async function requestorUnwrap() {
   const r = await fetch('/api/control-group/unwrap', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({requestor_token: cgRequestorToken, wrap_token: cgWrapToken})
+    body: JSON.stringify({wrap_token: cgWrapToken, key_name: 'demo-key-managed'})
   });
   const d = await r.json();
-  showApiPanel('gov-api', 'gov-curl', 'gov-api-arrow', d.curl || '');
+  showCurl('gov-api', 'gov-curl', d.curl || '');
   const el = document.getElementById('cg-unwrap-result');
   if (d.allowed) {
-    el.innerHTML = '<span class="text-success">✓ Export complete — dual approval fulfilled. Key material retrieved.</span>';
+    const ks = d.key_summary || {};
+    const keySummaryDisplay = JSON.stringify(ks, null, 2);
+    const versions = ks.keys ? Object.keys(ks.keys).length : 0;
+    el.innerHTML =
+      `<span class="text-success">✓ Export complete — dual approval fulfilled. Key material retrieved (${versions} version${versions !== 1 ? 's' : ''}).</span>` +
+      `<div style="margin-top:8px;background:var(--surface);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:10px 12px">` +
+      `<div style="font-size:0.68rem;color:var(--success);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600">transit/export response (key values truncated)</div>` +
+      `<pre style="margin:0;font-size:0.78rem;color:var(--text);white-space:pre-wrap;font-family:'JetBrains Mono',monospace">${keySummaryDisplay}</pre></div>`;
   } else {
-    el.innerHTML = `<span class="text-danger">✗ Unwrap failed: ${d.error || 'unknown'}</span>`;
+    el.innerHTML = `<span class="text-danger">✗ Collect failed: ${d.error || 'unknown'}</span>`;
   }
 }
 
@@ -1138,12 +1565,40 @@ async function attemptDelete(keyName) {
     body: JSON.stringify({token: rootToken, key_name: keyName})
   });
   const d = await r.json();
-  showApiPanel('del-api', 'del-curl', 'del-api-arrow', d.curl || '');
+  showCurl('del-api', 'del-curl', d.curl || '');
   const el = document.getElementById('delete-result');
   if (d.allowed) {
-    el.innerHTML = `<span class="text-success">✓ ${keyName} deleted successfully</span>`;
+    const recreateBtn = keyName === 'demo-key-managed'
+      ? ` &nbsp;<button class="btn btn-sm btn-outline-accent" onclick="recreateKey('demo-key-managed', this)"><span class="btn-label">Recreate for CG demo</span></button>`
+      : '';
+    el.innerHTML = `<span class="text-success">✓ ${keyName} deleted successfully</span>${recreateBtn}`;
   } else {
     el.innerHTML = `<span class="text-danger">✗ ${keyName}: ${d.error || 'Deletion blocked'}</span>`;
+  }
+}
+
+async function recreateKey(keyName, btn) {
+  btn.dataset.label = btn.querySelector('.btn-label').textContent;
+  setLoading(btn, true);
+  try {
+    const r = await fetch('/api/recreate-key', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token: rootToken, key_name: keyName})
+    });
+    const d = await r.json();
+    showCurl('del-api', 'del-curl', d.curl || '');
+    const el = document.getElementById('delete-result');
+    if (d.allowed) {
+      el.innerHTML = `<span class="text-success">✓ ${keyName} recreated — ready for Control Group demo</span>`;
+    } else {
+      el.innerHTML += ` <span class="text-danger">✗ Recreate failed: ${d.error || 'unknown'}</span>`;
+    }
+  } catch (e) {
+    document.getElementById('delete-result').innerHTML += ` <span class="text-danger">✗ ${e.message}</span>`;
+  } finally {
+    setLoading(btn, false);
+    if (btn.querySelector('.btn-label')) btn.querySelector('.btn-label').textContent = 'Recreate for CG demo';
   }
 }
 </script>

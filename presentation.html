@@ -71,7 +71,7 @@
       display: none;
       width: 100%;
       height: 100vh;
-      padding: 60px 80px;
+      padding: 68px 96px;
       flex-direction: column;
       justify-content: center;
       position: absolute;
@@ -140,47 +140,47 @@
 
     /* ─── Typography ──────────────────────────────────────────────── */
     .eyebrow {
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       font-weight: 600;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
     h1 {
-      font-size: 3.2rem;
+      font-size: 4rem;
       font-weight: 700;
       line-height: 1.1;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
       background: linear-gradient(90deg, #c0caf5, #7aa2f7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     h2 {
-      font-size: 2.1rem;
+      font-size: 2.8rem;
       font-weight: 700;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
       color: var(--text-1);
     }
 
     h3 {
-      font-size: 1.1rem;
+      font-size: 1.35rem;
       font-weight: 600;
       color: var(--accent);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .subtitle {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       color: var(--text-muted);
-      max-width: 680px;
+      max-width: 760px;
       line-height: 1.65;
     }
 
     p, li {
-      font-size: 1rem;
+      font-size: 1.1rem;
       line-height: 1.7;
       color: var(--text-2);
     }
@@ -194,15 +194,15 @@
     }
 
     /* ─── Layout ──────────────────────────────────────────────────── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 16px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; margin-top: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; margin-top: 16px; }
 
     /* ─── Components ──────────────────────────────────────────────── */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--r-card);
-      padding: 24px;
+      padding: 28px;
     }
     .card-accent {
       border-color: var(--accent);
@@ -217,12 +217,12 @@
       background: var(--code-bg);
       border: 1px solid var(--code-bd);
       border-radius: var(--r-code);
-      padding: 18px 22px;
+      padding: 20px 26px;
       font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 0.88rem;
+      font-size: 0.97rem;
       color: var(--code-text);
       margin-top: 14px;
-      line-height: 1.65;
+      line-height: 1.7;
     }
     .code-block .comment  { color: var(--code-comment); font-style: italic; }
     .code-block .keyword  { color: var(--code-keyword); }
@@ -234,7 +234,7 @@
       border: 1px solid var(--border-mid);
       border-radius: var(--r-sm);
       padding: 14px 20px;
-      font-size: 0.92rem;
+      font-size: 1.05rem;
       text-align: center;
       min-width: 130px;
       color: var(--text-2);
@@ -252,28 +252,28 @@
       background: var(--accent-dim);
       border: 1px solid var(--accent);
       color: var(--accent);
-      font-size: 0.72rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      padding: 3px 12px;
+      padding: 4px 14px;
       border-radius: var(--r-badge);
       letter-spacing: 0.1em;
       text-transform: uppercase;
       margin-bottom: 16px;
     }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.9rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 1rem; }
     th {
       text-align: left;
-      padding: 10px 14px;
+      padding: 12px 16px;
       background: rgba(122,162,247,0.08);
       color: var(--accent);
       font-weight: 600;
       border-bottom: 1px solid var(--accent-bd);
     }
-    td { padding: 10px 14px; border-bottom: 1px solid var(--border-sub); color: var(--text-2); }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border-sub); color: var(--text-2); }
     tr:last-child td { border-bottom: none; }
 
-    code { color: var(--cyan); font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.88em; }
+    code { color: var(--cyan); font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.92em; }
 
     /* ─── Animated arrows ─────────────────────────────────────────── */
     @keyframes flowDown {
@@ -394,7 +394,7 @@
 <body>
 
 <div class="progress" id="progress"></div>
-<div class="slide-num" id="slide-num">01 / 16</div>
+<div class="slide-num" id="slide-num">01 / 18</div>
 <div class="hint">← → navigate &nbsp;·&nbsp; S notes &nbsp;·&nbsp; O overview &nbsp;·&nbsp; F fullscreen</div>
 
 <div class="deck" id="deck">
@@ -407,54 +407,80 @@
     <div class="notes"><p>Opening slide. Set context: Vault Transit + HSM auto-unseal gives you encryption-as-a-service with a hardware root of trust. Applications never touch a key. The key never leaves the HSM.</p></div>
   </div>
 
-  <!-- ② The Problem -->
+  <!-- ② Situation -->
   <div class="slide slide-dark">
-    <div class="eyebrow" data-anim="fade-up">The Challenge</div>
-    <h2 data-anim="fade-up" style="animation-delay:.06s">How do you protect a key<br>without seeing it?</h2>
+    <div class="eyebrow" data-anim="fade-up">Situation</div>
+    <h2 data-anim="fade-up" style="animation-delay:.06s">Your organisation handles sensitive data that must be protected</h2>
     <div class="grid-2">
       <ul data-anim="stagger">
-        <li style="margin-bottom:13px">Applications need to encrypt sensitive data</li>
-        <li style="margin-bottom:13px">Keys must never be exposed to applications</li>
-        <li style="margin-bottom:13px">Compliance requires hardware-backed key storage</li>
-        <li style="margin-bottom:13px">Key rotation must not break existing data</li>
-        <li>Separation of duties — who can encrypt vs decrypt</li>
+        <li style="margin-bottom:13px">Personnel records, financial data, credentials, health information</li>
+        <li style="margin-bottom:13px">ISM, Privacy Act, and PCI-DSS mandate encryption of sensitive data at rest</li>
+        <li style="margin-bottom:13px">Encryption is already in place — or required to be</li>
+        <li>The perimeter is no longer the boundary — data protection must travel with the data</li>
       </ul>
       <div class="card card-accent" data-anim="fade-up" style="animation-delay:.2s">
-        <h3>The Risk</h3>
-        <p>When applications manage their own keys, keys end up in config files, environment variables, and logs — exposed and unaudited.</p>
-        <br>
-        <p style="color:var(--accent)">The application should never see the key.</p>
+        <h3>The given</h3>
+        <p>Encryption is non-negotiable. Regulators, auditors, and boards all agree. The question is not <em>whether</em> to encrypt — it is <em>how safely</em> the keys are managed.</p>
       </div>
     </div>
-    <div class="notes"><p>The core problem: key management is hard. When apps handle their own keys, they always end up somewhere they shouldn't. Goal: move key management out of the application entirely.</p></div>
+    <div class="notes"><p>Establish shared context the audience already agrees with. Encryption is mandated and happening. The problem is not the encryption itself — it's what happens to the keys.</p></div>
   </div>
 
-  <!-- ③ Solution Overview -->
+  <!-- ③ Complication -->
+  <div class="slide slide-dark">
+    <div class="eyebrow" data-anim="fade-up">Complication</div>
+    <h2 data-anim="fade-up" style="animation-delay:.06s">Encryption is only as strong as key management</h2>
+    <div class="grid-2">
+      <ul data-anim="stagger">
+        <li style="margin-bottom:13px">Keys end up in config files, environment variables, and logs</li>
+        <li style="margin-bottom:13px">No audit trail — you cannot prove who accessed what, or when</li>
+        <li style="margin-bottom:13px">Key rotation requires application changes and risks downtime</li>
+        <li style="margin-bottom:13px">A single privileged user can export or delete a key unilaterally</li>
+        <li>Compliance requires hardware-backed key storage — most apps don't have it</li>
+      </ul>
+      <div class="card" style="border-color:var(--red)" data-anim="fade-up" style="animation-delay:.2s">
+        <h3 style="color:var(--red)">The real risk</h3>
+        <p>Whoever holds the key holds the data. If an attacker — or an insider — gets the key, the encryption is worthless.</p>
+        <br>
+        <p style="color:var(--text-muted)">And right now, the key is probably somewhere it shouldn't be.</p>
+      </div>
+    </div>
+    <div class="notes"><p>This is where the audience leans forward. The encryption they already have is undermined by poor key management. Name the specific failure modes — config files, no audit, single person with full power.</p></div>
+  </div>
+
+  <!-- ④ Question -->
+  <div class="slide slide-cover">
+    <div class="eyebrow" data-anim="fade-up">The Question</div>
+    <h1 data-anim="fade-up" style="animation-delay:.08s">How do you encrypt data at scale — without the application ever touching a key?</h1>
+    <div class="notes"><p>Pause here. Let the question land. This is the pivot from problem to solution. Everything that follows is the answer.</p></div>
+  </div>
+
+  <!-- ⑤ Answer -->
   <div class="slide slide-accent">
-    <div class="eyebrow" data-anim="fade-up">The Solution</div>
+    <div class="eyebrow" data-anim="fade-up">Answer</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">How Encryption as a Service Works</h2>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:14px">
       <div style="display:flex;flex-direction:column;gap:14px" data-anim="stagger">
 
         <div style="display:flex;align-items:flex-start;gap:14px">
-          <div style="min-width:26px;height:26px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.82rem;flex-shrink:0">1</div>
-          <div><p style="color:var(--text-1);font-weight:600">App sends plaintext to Vault API</p><p style="color:var(--text-dim);font-size:0.88rem">e.g. a personnel record or credential</p></div>
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">1</div>
+          <div><p style="color:var(--text-1);font-weight:600">App sends plaintext to Vault API</p><p style="color:var(--text-dim);font-size:1.05rem">e.g. a personnel record or credential</p></div>
         </div>
 
         <div style="display:flex;align-items:flex-start;gap:14px">
-          <div style="min-width:26px;height:26px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.82rem;flex-shrink:0">2</div>
-          <div><p style="color:var(--text-1);font-weight:600">Vault requests the barrier key from the HSM via PKCS#11 / KMIP</p><p style="color:var(--text-dim);font-size:0.88rem">libvault-pkcs11.so calls vault-hsm's KMIP engine — key never exported to disk</p></div>
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">2</div>
+          <div><p style="color:var(--text-1);font-weight:600">Vault validates the token and selects the transit key from memory</p><p style="color:var(--text-dim);font-size:1.05rem">Token checked against policy — only authorised callers can encrypt</p></div>
         </div>
 
         <div style="display:flex;align-items:flex-start;gap:14px">
-          <div style="min-width:26px;height:26px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.82rem;flex-shrink:0">3</div>
-          <div><p style="color:var(--text-1);font-weight:600">Vault encrypts the data internally</p><p style="color:var(--text-dim);font-size:0.88rem">Encryption happens inside Vault memory using the HSM-backed key</p></div>
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">3</div>
+          <div><p style="color:var(--text-1);font-weight:600">Vault encrypts the data using the transit key</p><p style="color:var(--text-dim);font-size:1.05rem">Returns <code>vault:vN:&lt;ciphertext&gt;</code> — the key itself is never part of the response</p></div>
         </div>
 
         <div style="display:flex;align-items:flex-start;gap:14px">
-          <div style="min-width:26px;height:26px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.82rem;flex-shrink:0">4</div>
-          <div><p style="color:var(--text-1);font-weight:600">Vault returns ciphertext to the app</p><p style="color:var(--text-dim);font-size:0.88rem">App stores ciphertext — never the key, never the plaintext</p></div>
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">4</div>
+          <div><p style="color:var(--text-1);font-weight:600">Vault returns ciphertext to the app</p><p style="color:var(--text-dim);font-size:1.05rem">App stores ciphertext — never the key, never the plaintext</p></div>
         </div>
 
       </div>
@@ -464,20 +490,13 @@
           <div class="flow-box" style="width:200px;padding:14px">🖥️ Application<br><small style="color:var(--text-dim)">sends plaintext</small></div>
         </div>
         <div style="width:200px;display:flex;justify-content:center"><div class="arrow-down"><span></span><span></span><span></span></div></div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="flow-box highlighted" style="width:200px;padding:14px">🏛️ Vault Transit<br><small>encrypts internally</small></div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <div style="color:var(--text-dimmer);font-size:0.68rem">PKCS#11 / KMIP</div>
-            <div class="arrow-right"><span></span><span></span><span></span></div>
-          </div>
-          <div class="flow-box" style="width:170px;padding:14px">🔒 HSM<br><small style="color:var(--text-dim)">key lives here</small></div>
-        </div>
+        <div class="flow-box highlighted" style="width:200px;padding:14px">🏛️ Vault Transit<br><small>encrypts with in-memory key</small></div>
         <div style="width:200px;display:flex;justify-content:center"><div class="arrow-down"><span></span><span></span><span></span></div></div>
         <div style="width:200px;display:flex;justify-content:center">
           <div class="flow-box" style="width:200px;padding:14px">🖥️ Application<br><small style="color:var(--text-dim)">receives ciphertext</small></div>
         </div>
-        <div style="margin-top:6px;padding:8px 18px;border:1px solid var(--accent);border-radius:var(--r-sm);color:var(--accent);font-size:0.82rem;text-align:center">
-          Key never leaves HSM
+        <div style="margin-top:6px;padding:8px 18px;border:1px solid var(--accent);border-radius:var(--r-sm);color:var(--accent);font-size:1rem;text-align:center">
+          App never sees the key
         </div>
       </div>
     </div>
@@ -499,16 +518,16 @@
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px" data-anim="fade-in" style="animation-delay:.2s">
         <div class="flow-box" style="width:220px;padding:14px;border-color:var(--accent);background:var(--bg-card-acc)">🔒 HSM<br><small style="color:var(--text-dim)">holds master key — never leaves hardware</small></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-          <div style="color:var(--text-dimmer);font-size:0.72rem">wraps / unwraps on demand</div>
+          <div style="color:var(--text-dimmer);font-size:1rem">wraps / unwraps on demand</div>
           <div class="arrow-down"><span></span><span></span><span></span></div>
         </div>
         <div class="flow-box highlighted" style="width:220px;padding:14px">🏛️ Vault Storage<br><small>Transit key — encrypted at rest</small></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-          <div style="color:var(--text-dimmer);font-size:0.72rem">decrypted into memory</div>
+          <div style="color:var(--text-dimmer);font-size:1rem">decrypted into memory</div>
           <div class="arrow-down"><span></span><span></span><span></span></div>
         </div>
         <div class="flow-box" style="width:220px;padding:14px">🖥️ Your Data<br><small style="color:var(--text-dim)">encrypted / decrypted</small></div>
-        <div style="margin-top:6px;padding:8px 18px;border:1px solid var(--accent);border-radius:var(--r-sm);color:var(--accent);font-size:0.82rem;text-align:center">
+        <div style="margin-top:6px;padding:8px 18px;border:1px solid var(--accent);border-radius:var(--r-sm);color:var(--accent);font-size:1rem;text-align:center">
           Stealing Vault storage alone is useless
         </div>
       </div>
@@ -524,68 +543,68 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:18px;align-items:start">
 
       <div>
-        <div style="display:inline-block;background:var(--bg-mid);border:1px solid var(--accent);border-radius:var(--r-sm);padding:3px 12px;font-size:0.72rem;font-weight:700;color:var(--accent);letter-spacing:0.06em;margin-bottom:12px" data-anim="fade-up">STARTUP — once only</div>
+        <div style="display:inline-block;background:var(--bg-mid);border:1px solid var(--accent);border-radius:var(--r-sm);padding:3px 12px;font-size:1rem;font-weight:700;color:var(--accent);letter-spacing:0.06em;margin-bottom:12px" data-anim="fade-up">STARTUP — once only</div>
         <div style="display:flex;flex-direction:column;gap:9px" data-anim="stagger">
 
           <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="min-width:24px;height:24px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">1</div>
+            <div style="min-width:30px;height:30px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">1</div>
             <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-              <strong style="color:var(--text-1);font-size:0.86rem">vault-main starts — sealed</strong>
-              <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px">All storage encrypted at rest. Cannot serve requests.</p>
+              <strong style="color:var(--text-1);font-size:1.05rem">vault-main starts — sealed</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:2px">All storage encrypted at rest. Cannot serve requests.</p>
             </div>
           </div>
 
           <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="min-width:24px;height:24px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">2</div>
+            <div style="min-width:30px;height:30px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">2</div>
             <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-              <strong style="color:var(--accent);font-size:0.86rem">→ vault-hsm: unwrap barrier key</strong>
-              <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px">vault-hsm uses master key to unwrap and return the barrier key. <strong style="color:var(--text-1)">Only engagement with vault-hsm.</strong></p>
+              <strong style="color:var(--accent);font-size:1.05rem">→ vault-hsm: unwrap barrier key</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:2px">vault-hsm uses master key to unwrap and return the barrier key. <strong style="color:var(--text-1)">Only engagement with vault-hsm.</strong></p>
             </div>
           </div>
 
           <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="min-width:24px;height:24px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">3</div>
+            <div style="min-width:30px;height:30px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">3</div>
             <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-              <strong style="color:var(--text-1);font-size:0.86rem">Transit keyring loaded into memory</strong>
-              <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px">Barrier key decrypts storage. <code>demo-key</code> cached in memory. vault-main is unsealed.</p>
+              <strong style="color:var(--text-1);font-size:1.05rem">Transit keyring loaded into memory</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:2px">Barrier key decrypts storage. <code>demo-key</code> cached in memory. vault-main is unsealed.</p>
             </div>
           </div>
 
-          <div style="padding:9px 12px;border:1px solid var(--accent);border-radius:var(--r-md);background:var(--bg-card-acc);font-size:0.78rem;color:var(--accent)">
+          <div style="padding:9px 12px;border:1px solid var(--accent);border-radius:var(--r-md);background:var(--bg-card-acc);font-size:0.95rem;color:var(--accent)">
             🔑 Master key never leaves vault-hsm. Transit keys never touch disk in plaintext.
           </div>
         </div>
       </div>
 
       <div>
-        <div style="display:inline-block;background:var(--bg-mid);border:1px solid var(--green);border-radius:var(--r-sm);padding:3px 12px;font-size:0.72rem;font-weight:700;color:var(--green);letter-spacing:0.06em;margin-bottom:12px" data-anim="fade-up" style="animation-delay:.08s">PER REQUEST — every call</div>
+        <div style="display:inline-block;background:var(--bg-mid);border:1px solid var(--green);border-radius:var(--r-sm);padding:3px 12px;font-size:1rem;font-weight:700;color:var(--green);letter-spacing:0.06em;margin-bottom:12px" data-anim="fade-up" style="animation-delay:.08s">PER REQUEST — every call</div>
         <div style="display:flex;flex-direction:column;gap:9px" data-anim="stagger">
 
           <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="min-width:24px;height:24px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">1</div>
+            <div style="min-width:30px;height:30px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">1</div>
             <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-              <strong style="color:var(--text-1);font-size:0.86rem">App → vault-main: plaintext + token</strong>
-              <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px">App calls <code>POST /v1/transit/encrypt/demo-key</code>. Token validated against policy.</p>
+              <strong style="color:var(--text-1);font-size:1.05rem">App → vault-main: plaintext + token</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:2px">App calls <code>POST /v1/transit/encrypt/demo-key</code>. Token validated against policy.</p>
             </div>
           </div>
 
           <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="min-width:24px;height:24px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">2</div>
+            <div style="min-width:30px;height:30px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">2</div>
             <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-              <strong style="color:var(--text-1);font-size:0.86rem">vault-main encrypts using in-memory key</strong>
-              <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px"><code>demo-key</code> already in memory. <strong style="color:var(--accent)">vault-hsm not called.</strong> Fast and local.</p>
+              <strong style="color:var(--text-1);font-size:1.05rem">vault-main encrypts using in-memory key</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:2px"><code>demo-key</code> already in memory. <strong style="color:var(--accent)">vault-hsm not called.</strong> Fast and local.</p>
             </div>
           </div>
 
           <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="min-width:24px;height:24px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">3</div>
+            <div style="min-width:30px;height:30px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">3</div>
             <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-              <strong style="color:var(--text-1);font-size:0.86rem">App receives ciphertext</strong>
-              <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px"><code>vault:v1:...</code> returned. Key never written to disk. App never saw the key.</p>
+              <strong style="color:var(--text-1);font-size:1.05rem">App receives ciphertext</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:2px"><code>vault:v1:...</code> returned. Key never written to disk. App never saw the key.</p>
             </div>
           </div>
 
-          <div style="padding:9px 12px;border:1px solid var(--green);border-radius:var(--r-md);background:var(--green-dim);font-size:0.78rem;color:var(--green)">
+          <div style="padding:9px 12px;border:1px solid var(--green);border-radius:var(--r-md);background:var(--green-dim);font-size:0.95rem;color:var(--green)">
             ⚡ vault-hsm re-engaged only on restart or key rotation — not on every request.
           </div>
         </div>
@@ -597,29 +616,173 @@
 
   <!-- ⑥ Transit Engine -->
   <div class="slide slide-dark">
-    <div class="eyebrow" data-anim="fade-up">Vault Transit Engine</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:4px" data-anim="fade-up">
+      <div class="eyebrow" style="margin-bottom:0">Vault Transit Engine</div>
+      <div style="display:inline-block;background:rgba(122,162,247,0.12);border:1px solid rgba(122,162,247,0.4);color:#7aa2f7;font-size:0.78rem;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:0.1em;text-transform:uppercase">Summary</div>
+    </div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">Encryption as a Service</h2>
-    <div class="grid-2">
-      <ul data-anim="stagger">
-        <li style="margin-bottom:13px">Applications encrypt/decrypt via Vault API</li>
-        <li style="margin-bottom:13px">Encryption keys managed entirely by Vault</li>
-        <li style="margin-bottom:13px">Keys never exported or exposed</li>
-        <li style="margin-bottom:13px">Built-in key versioning and rotation</li>
-        <li>Full audit log of every operation</li>
-      </ul>
-      <div class="code-block" data-anim="fade-up" style="animation-delay:.2s">
-        <span class="comment"># Encrypt sensitive data</span><br>
-        vault write transit/encrypt/demo-key \<br>
-        &nbsp;&nbsp;plaintext=$(base64 &lt;&lt;&lt; "personnel record")<br><br>
-        <span class="comment"># Returns ciphertext only</span><br>
-        <span class="highlight">vault:v1:ABC123xyz...</span><br><br>
-        <span class="comment"># Application never sees the key</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:16px" data-anim="stagger">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">🔌</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">API-driven</h3>
+        <p>Applications encrypt and decrypt via a simple REST call — key material stays server-side, out of application code entirely</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">🔑</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">Keys stay in Vault</h3>
+        <p>Encryption keys are managed entirely by Vault — never exported or exposed</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">🔄</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">Built-in rotation</h3>
+        <p>Keys are versioned — rotate at any time without breaking existing ciphertext</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;width:66%;margin-left:auto;margin-right:auto" data-anim="stagger">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">📋</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">Full audit trail</h3>
+        <p>Every operation is logged with identity, timestamp, and context</p>
+      </div>
+      <div class="card card-accent" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">🛡️</div>
+        <h3 style="margin-bottom:8px">App never sees the key</h3>
+        <p>The application only ever handles ciphertext — never key material</p>
       </div>
     </div>
     <div class="notes"><p>The Transit engine is the "encryption as a service" primitive. The app sends data in, gets ciphertext back. Vault owns the key entirely — it never appears in the response.</p></div>
   </div>
 
-  <!-- ⑦ HSM Integration -->
+  <!-- ⑦ Encryption Methods -->
+  <div class="slide slide-dark">
+    <div class="eyebrow" data-anim="fade-up">Vault Transit &amp; Transform</div>
+    <h2 data-anim="fade-up" style="animation-delay:.06s">Choosing the Right Encryption Method</h2>
+    <table style="margin-top:4px;font-size:1rem" data-anim="fade-in" style="animation-delay:.1s">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Engine</th>
+          <th>Output</th>
+          <th>Schema change</th>
+          <th>Searchable</th>
+          <th>Best for</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--text-1);font-weight:600">Encryption (AES-GCM)</td>
+          <td style="color:var(--accent)">Transit</td>
+          <td><code>vault:v1:AbC…</code> — longer than input</td>
+          <td style="color:var(--yellow)">Yes</td>
+          <td style="color:var(--red)">✗ random IV</td>
+          <td>JSON, blobs, documents</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-1);font-weight:600">FPE (FF3-1)</td>
+          <td style="color:var(--purple)">Transform</td>
+          <td>Same format as input — <code>4111-2345-6789-0123</code></td>
+          <td style="color:var(--green)">No</td>
+          <td style="color:var(--green)">✓ deterministic</td>
+          <td>SSN, card numbers, IDs — legacy schemas</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-1);font-weight:600">Tokenization</td>
+          <td style="color:var(--purple)">Transform</td>
+          <td>Random surrogate token — <code>tok_8f3kLp2q</code></td>
+          <td style="color:var(--yellow)">Yes</td>
+          <td style="color:var(--green)">✓ deterministic</td>
+          <td>PAN replacement, PCI compliance</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-1);font-weight:600">Masking</td>
+          <td style="color:var(--purple)">Transform</td>
+          <td>Redacted display — <code>****-****-****-1234</code></td>
+          <td style="color:var(--green)">No</td>
+          <td style="color:var(--red)">✗ irreversible</td>
+          <td>Logs, display layer, non-prod data</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:18px" data-anim="fade-in" style="animation-delay:.2s">
+      <div style="padding:14px 18px;background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md)">
+        <div style="color:var(--red);font-weight:700;font-size:1rem;margin-bottom:6px">Why Transit cannot be searched</div>
+        <p style="font-size:1rem">AES-GCM generates a fresh random IV for every encryption — the same SSN produces a different ciphertext every time. A DB index is useless.</p>
+      </div>
+      <div style="padding:14px 18px;background:var(--bg-mid);border:1px solid var(--green);border-radius:var(--r-md)">
+        <div style="color:var(--green);font-weight:700;font-size:1rem;margin-bottom:6px">Why FPE &amp; tokenization can be searched</div>
+        <p style="font-size:1rem">Both are deterministic — the same input always produces the same output for the same key. DB equality indexes work unchanged.</p>
+      </div>
+    </div>
+    <div class="notes"><p>Transit is for encrypting arbitrary data where you don't need to search. FPE is for structured sensitive fields where schema changes are undesirable. Tokenization is for PCI-style surrogate replacement. Masking is one-way — display only.</p></div>
+  </div>
+
+  <!-- ⑧ Searching Encrypted Data -->
+  <div class="slide slide-dark">
+    <div class="eyebrow" data-anim="fade-up">Existing Data</div>
+    <h2 data-anim="fade-up" style="animation-delay:.06s">Encrypting an Existing Database</h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:14px;align-items:start">
+
+      <div data-anim="stagger">
+        <h3 style="margin-bottom:14px">Migration — shadow column strategy</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">1</div>
+            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
+              <strong style="color:var(--text-1)">Add encrypted column alongside original</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px"><code>ssn</code> → add <code>ssn_enc</code>. No schema breakage — old column still serves live traffic.</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">2</div>
+            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
+              <strong style="color:var(--text-1)">Batch-encrypt existing rows via Vault</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Vault's bulk endpoint handles thousands of rows per call. No downtime required.</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">3</div>
+            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
+              <strong style="color:var(--text-1)">Deploy app reading from encrypted column</strong>
+              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Dual-write during cutover — new writes go encrypted, old column is verified then dropped.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-anim="fade-in" style="animation-delay:.18s">
+        <h3 style="margin-bottom:14px">Search — encrypt the query term first</h3>
+        <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:16px 20px">
+          <div style="color:var(--text-dimmer);font-size:0.88rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px">FPE or tokenization — equality search</div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;font-size:0.95rem;white-space:nowrap">User searches: <strong style="color:var(--text-1)">"123-45-6789"</strong></div>
+            </div>
+            <div style="padding-left:8px;color:var(--text-dimmer);font-size:0.9rem">↓ app encrypts the search term via Vault</div>
+            <div style="background:var(--bg-card-acc);border:1px solid var(--accent);border-radius:var(--r-sm);padding:7px 12px;font-size:0.95rem">
+              Vault FPE: <code style="color:var(--accent)">"123-45-6789"</code> → <code style="color:var(--accent)">"847-23-9156"</code> <span style="color:var(--text-dimmer);font-size:0.85rem">(always same)</span>
+            </div>
+            <div style="padding-left:8px;color:var(--text-dimmer);font-size:0.9rem">↓ query the encrypted column directly</div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;font-family:monospace;font-size:0.92rem">
+              SELECT * FROM users<br>WHERE ssn_enc = <span style="color:var(--accent)">'847-23-9156'</span>
+            </div>
+            <div style="padding-left:8px;color:var(--text-dimmer);font-size:0.9rem">↓ decrypt result to display</div>
+            <div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r-sm);padding:7px 12px;font-size:0.95rem;color:var(--green)">
+              ✓ Row returned — app decrypts for display. DB never saw plaintext.
+            </div>
+          </div>
+
+          <div style="margin-top:14px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border-mid);border-radius:var(--r-sm);font-size:0.95rem;color:var(--text-muted)">
+            ⚠ Range queries (<code>BETWEEN</code>, <code>&gt;</code>, <code>&lt;</code>) are not supported on encrypted columns — accepted trade-off for sensitive fields.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="notes"><p>The shadow column approach is zero-downtime. The key insight for search: you never search for plaintext — you encrypt the search term first, then query. FPE is especially powerful here because the encrypted value is the same format, so existing DB indexes work without change.</p></div>
+  </div>
+
+  <!-- ⑨ HSM Integration -->
   <div class="slide slide-accent">
     <div class="eyebrow" data-anim="fade-up">HSM Integration</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">Hardware Root of Trust</h2>
@@ -647,21 +810,33 @@
   <div class="slide slide-dark">
     <div class="eyebrow" data-anim="fade-up">Key Lifecycle</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">Key Rotation Without Breaking Data</h2>
-    <div class="grid-2">
-      <ul data-anim="stagger">
-        <li style="margin-bottom:13px">Keys are versioned — rotation creates a new version</li>
-        <li style="margin-bottom:13px">New encryptions use the latest key version</li>
-        <li style="margin-bottom:13px">Old ciphertext remains decryptable — no re-encryption required</li>
-        <li style="margin-bottom:13px">Minimum decryption version can be set to retire old keys</li>
-        <li>Zero application downtime during rotation</li>
-      </ul>
-      <div class="code-block" data-anim="fade-up" style="animation-delay:.2s">
-        <span class="comment"># Rotate the key</span><br>
-        vault write -f transit/keys/demo-key/rotate<br><br>
-        <span class="comment"># New ciphertext uses v2</span><br>
-        <span class="highlight">vault:v2:XYZ789abc...</span><br><br>
-        <span class="comment"># Old v1 ciphertext still works</span><br>
-        <span class="highlight">vault:v1:ABC123xyz...</span> ✓
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:16px" data-anim="stagger">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">📦</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">Versioned keys</h3>
+        <p>Rotation creates a new version — old versions are kept, not deleted</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">✍️</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">New writes use latest</h3>
+        <p>Every new encryption automatically uses the current key version</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">🔓</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">Old data still works</h3>
+        <p>Existing ciphertext remains decryptable — no re-encryption required</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;width:66%;margin-left:auto;margin-right:auto" data-anim="stagger">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">🎚️</div>
+        <h3 style="color:var(--accent);margin-bottom:8px">Retire old versions</h3>
+        <p>Set a minimum decryption version to force migration of old ciphertext</p>
+      </div>
+      <div class="card card-accent" style="text-align:center">
+        <div style="font-size:2rem;margin-bottom:10px">⚡</div>
+        <h3 style="margin-bottom:8px">Zero downtime</h3>
+        <p>Applications need no changes — rotation is transparent to the caller</p>
       </div>
     </div>
     <div class="notes"><p>Key rotation is additive — old versions are retained. The version prefix (v1, v2...) is embedded in ciphertext so Vault always knows which key to use. Apps don't change. No downtime.</p></div>
@@ -676,7 +851,7 @@
       <div style="display:flex;flex-direction:column;gap:14px" data-anim="stagger">
         <div class="card"><h3>Rotation is Additive</h3><p>A new key version is created — old versions are <strong style="color:var(--accent)">kept</strong>, not deleted. Vault maintains all versions until explicitly retired.</p></div>
         <div class="card"><h3>Ciphertext is Self-Describing</h3><p>The key version is embedded in every ciphertext token. Vault reads it and uses the correct version automatically.</p>
-          <div class="code-block" style="margin-top:10px;font-size:0.82rem">
+          <div class="code-block" style="margin-top:10px;font-size:1rem">
             <span class="highlight">vault:v1:</span>ABC123...&nbsp;&nbsp;<span class="comment">← uses v1</span><br>
             <span class="highlight">vault:v2:</span>XYZ789...&nbsp;&nbsp;<span class="comment">← uses v2</span>
           </div>
@@ -684,40 +859,122 @@
         <div class="card card-accent"><h3>Zero App Changes</h3><p>Apps send ciphertext to Vault — Vault selects the right key version transparently. No code change. No downtime.</p></div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:20px" data-anim="fade-in" style="animation-delay:.18s">
-        <div>
-          <div style="color:var(--text-dimmer);font-size:0.76rem;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em">Before Rotation</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="flow-box" style="width:115px;font-size:0.83rem">App<br><small style="color:var(--text-dim)">vault:v1:ABC</small></div>
-            <div class="arrow-right"><span></span><span></span><span></span></div>
-            <div class="flow-box highlighted" style="width:135px;font-size:0.83rem">Vault<br><small>decrypts with v1</small></div>
-            <div style="color:var(--green-light);font-size:1.1rem">✓</div>
-          </div>
-        </div>
-        <div>
-          <div style="color:var(--text-dimmer);font-size:0.76rem;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em">After Rotation</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <div class="flow-box" style="width:115px;font-size:0.83rem">App<br><small style="color:var(--text-dim)">vault:v1:ABC</small></div>
-              <div class="arrow-right"><span></span><span></span><span></span></div>
-              <div class="flow-box highlighted" style="width:135px;font-size:0.83rem">Vault<br><small>decrypts with v1</small></div>
-              <div style="color:var(--green-light);font-size:1.1rem">✓</div>
+      <div style="display:flex;flex-direction:column;gap:16px" data-anim="fade-in" style="animation-delay:.18s">
+
+        <!-- Keyring diagram -->
+        <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:20px 24px">
+          <div style="color:var(--text-dimmer);font-size:0.92rem;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.1em">How Vault resolves the right key</div>
+
+          <!-- Ciphertexts -->
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 14px;font-family:monospace;font-size:1rem;white-space:nowrap">
+                <span style="color:var(--accent);font-weight:700">vault:v1:</span><span style="color:var(--text-2)">ABC123…</span>
+              </div>
+              <div style="color:var(--text-dimmer);font-size:0.85rem;font-style:italic">encrypted before rotation</div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div class="flow-box" style="width:115px;font-size:0.83rem">App<br><small style="color:var(--text-dim)">vault:v2:XYZ</small></div>
-              <div class="arrow-right"><span></span><span></span><span></span></div>
-              <div class="flow-box highlighted" style="width:135px;font-size:0.83rem">Vault<br><small>decrypts with v2</small></div>
-              <div style="color:var(--green-light);font-size:1.1rem">✓</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 14px;font-family:monospace;font-size:1rem;white-space:nowrap">
+                <span style="color:var(--accent);font-weight:700">vault:v2:</span><span style="color:var(--text-2)">XYZ789…</span>
+              </div>
+              <div style="color:var(--text-dimmer);font-size:0.85rem;font-style:italic">encrypted after rotation</div>
             </div>
           </div>
+
+          <!-- Arrow down into Vault -->
+          <div style="display:flex;justify-content:center;margin-bottom:12px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text-dimmer);font-size:0.85rem">
+              <span>both sent to the same endpoint</span>
+              <div class="arrow-down"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+
+          <!-- Vault keyring box -->
+          <div style="background:var(--bg-card-acc);border:1px solid var(--accent);border-radius:var(--r-md);padding:12px 18px;margin-bottom:12px">
+            <div style="color:var(--accent);font-weight:700;font-size:1rem;margin-bottom:10px">🏛️ Vault Keyring — transit/decrypt/demo-key</div>
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-sm);padding:8px 12px;text-align:center">
+                <div style="color:var(--accent);font-weight:700;font-size:1rem">v1 key</div>
+                <div style="color:var(--text-dimmer);font-size:0.85rem">original</div>
+              </div>
+              <div style="flex:1;background:var(--bg-mid);border:1px solid var(--accent);border-radius:var(--r-sm);padding:8px 12px;text-align:center">
+                <div style="color:var(--accent);font-weight:700;font-size:1rem">v2 key</div>
+                <div style="color:var(--text-dimmer);font-size:0.85rem">current</div>
+              </div>
+            </div>
+            <div style="color:var(--text-muted);font-size:0.9rem;margin-top:10px;text-align:center">reads prefix → picks matching version automatically</div>
+          </div>
+
+          <!-- Arrow down to plaintext -->
+          <div style="display:flex;justify-content:center;margin-bottom:12px">
+            <div class="arrow-down"><span></span><span></span><span></span></div>
+          </div>
+
+          <div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r-sm);padding:10px 16px;text-align:center;color:var(--green);font-size:1rem;font-weight:600">
+            ✓ plaintext returned — same result regardless of version
+          </div>
         </div>
-        <div class="card">
-          <h3>Optional — Retire Old Versions</h3>
-          <p style="font-size:0.9rem">Set a minimum decryption version to force re-encryption of old data. A deliberate compliance decision — not automatic.</p>
-        </div>
+
       </div>
     </div>
     <div class="notes"><p>The v-prefix makes rotation backwards-compatible by design. The "minimum decryption version" knob is the compliance lever — force data migration at your own pace.</p></div>
+  </div>
+
+  <!-- ⑨b Key Retirement -->
+  <div class="slide slide-dark">
+    <div class="eyebrow" data-anim="fade-up">Key Rotation</div>
+    <h2 data-anim="fade-up" style="animation-delay:.06s">Retiring an Old Key Version</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;margin-top:14px">
+
+      <!-- Left: concept + steps -->
+      <div style="display:flex;flex-direction:column;gap:14px" data-anim="stagger">
+        <div class="card">
+          <h3>Why Retire?</h3>
+          <p>Rotation keeps old versions available by default. Retirement is the deliberate act of <strong style="color:var(--accent)">enforcing</strong> that no data encrypted with a specific version can be decrypted — meeting compliance mandates for key lifetimes.</p>
+        </div>
+        <div class="card">
+          <h3>Two-step process</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="background:var(--accent);color:#0d1117;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;flex-shrink:0;margin-top:2px">1</div>
+              <div><strong style="color:var(--text)">Rewrap all ciphertext</strong><br><span style="color:var(--text-2);font-size:0.95rem">Vault re-encrypts each record with the current key version — application never sees plaintext.</span></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="background:var(--accent);color:#0d1117;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;flex-shrink:0;margin-top:2px">2</div>
+              <div><strong style="color:var(--text)">Advance min_decryption_version</strong><br><span style="color:var(--text-2);font-size:0.95rem">Vault rejects any ciphertext older than this version — old key material is permanently inaccessible.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-accent">
+          <h3>Impact on Ciphertext</h3>
+          <p>The version prefix changes: <code>vault:v1:…</code> → <code>vault:v3:…</code>. The ciphertext value changes (fresh IV). The plaintext is identical — zero data loss.</p>
+        </div>
+      </div>
+
+      <!-- Right: CLI commands -->
+      <div data-anim="fade-in" style="animation-delay:.18s">
+        <div style="color:var(--text-dimmer);font-size:0.88rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">CLI — Rewrap &amp; Retire</div>
+        <div class="code-block" style="font-size:0.9rem;line-height:1.9">
+          <span class="comment"># 1. Rewrap a record to the current key version</span><br>
+          vault write transit/rewrap/demo-key \<br>
+          &nbsp;&nbsp;ciphertext=<span class="highlight">"vault:v1:ABC…"</span><br>
+          <br>
+          <span class="comment"># Returns a new ciphertext at the latest version</span><br>
+          ciphertext: <span class="highlight">vault:v3:XYZ…</span><br>
+          <br>
+          <span class="comment"># 2. Retire v1 — v1 ciphertext now permanently rejected</span><br>
+          vault write transit/keys/demo-key/config \<br>
+          &nbsp;&nbsp;min_decryption_version=<span class="highlight">2</span><br>
+          <br>
+          <span class="comment"># Proof — attempt to decrypt old ciphertext</span><br>
+          vault write transit/decrypt/demo-key \<br>
+          &nbsp;&nbsp;ciphertext=<span class="highlight">"vault:v1:ABC…"</span><br>
+          <span style="color:var(--danger)">Error: ciphertext version is not allowed</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="notes"><p>Key point for the audience: rewrap is a server-side operation — the application submits ciphertext, Vault returns new ciphertext, plaintext never travels. After advancing min_decryption_version, that old version is mathematically unrecoverable even if someone exfiltrated the ciphertext earlier.</p></div>
   </div>
 
   <!-- ⑩ Key Governance -->
@@ -728,26 +985,26 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:18px;align-items:start">
       <div style="display:flex;flex-direction:column;gap:10px" data-anim="stagger">
         <div style="background:var(--bg-mid);border-left:4px solid var(--green);border-radius:0 var(--r-md) var(--r-md) 0;padding:10px 14px">
-          <div style="color:var(--green);font-weight:700;font-size:0.88rem">1 — Key Configuration</div>
-          <p style="color:var(--text-muted);font-size:0.8rem;margin-top:3px">Set at creation — <code style="color:var(--text-1)">exportable=false</code>, <code style="color:var(--text-1)">deletion_allowed=false</code>. Immutable. Even root cannot override.</p>
+          <div style="color:var(--green);font-weight:700;font-size:1.05rem">1 — Key Configuration</div>
+          <p style="color:var(--text-muted);font-size:1.05rem;margin-top:3px">Set at creation — <code style="color:var(--text-1)">exportable=false</code>, <code style="color:var(--text-1)">deletion_allowed=false</code>. Immutable. Even root cannot override.</p>
         </div>
         <div style="background:var(--bg-mid);border-left:4px solid var(--accent);border-radius:0 var(--r-md) var(--r-md) 0;padding:10px 14px">
-          <div style="color:var(--accent);font-weight:700;font-size:0.88rem">2 — ACL Policies</div>
-          <p style="color:var(--text-muted);font-size:0.8rem;margin-top:3px">Controls <em>who</em> can call each API path. Key viewer, exporter, destroyer — all separate roles with least privilege.</p>
+          <div style="color:var(--accent);font-weight:700;font-size:1.05rem">2 — ACL Policies</div>
+          <p style="color:var(--text-muted);font-size:1.05rem;margin-top:3px">Controls <em>who</em> can call each API path. Key viewer, exporter, destroyer — all separate roles with least privilege.</p>
         </div>
         <div style="background:var(--bg-mid);border-left:4px solid var(--purple);border-radius:0 var(--r-md) var(--r-md) 0;padding:10px 14px">
-          <div style="color:var(--purple);font-weight:700;font-size:0.88rem">3 — Sentinel Policy (EGP)</div>
-          <p style="color:var(--text-muted);font-size:0.8rem;margin-top:3px">Controls <em>under what conditions</em>. Time of day, IP range, MFA. Applied at the API endpoint — even privileged tokens are subject to it.</p>
+          <div style="color:var(--purple);font-weight:700;font-size:1.05rem">3 — Sentinel Policy (EGP)</div>
+          <p style="color:var(--text-muted);font-size:1.05rem;margin-top:3px">Controls <em>under what conditions</em>. Time of day, IP range, MFA. Applied at the API endpoint — even privileged tokens are subject to it. <em style="color:var(--text-dimmer)">(Available in Vault Enterprise — not in live demo)</em></p>
         </div>
         <div style="background:var(--bg-mid);border-left:4px solid var(--red);border-radius:0 var(--r-md) var(--r-md) 0;padding:10px 14px">
-          <div style="color:var(--red);font-weight:700;font-size:0.88rem">4 — Control Groups</div>
-          <p style="color:var(--text-muted);font-size:0.8rem;margin-top:3px">Requires a second human to approve. No single person can export or delete a key unilaterally. Dual control enforced by Vault.</p>
+          <div style="color:var(--red);font-weight:700;font-size:1.05rem">4 — Control Groups ★ Demo</div>
+          <p style="color:var(--text-muted);font-size:1.05rem;margin-top:3px">Requires a second human to approve before Vault releases key material. No single person can export a key unilaterally. Three-phase flow: operator requests → custodian approves → operator collects.</p>
         </div>
       </div>
 
       <div data-anim="fade-in" style="animation-delay:.2s">
-        <div style="color:var(--text-dim);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Permission Matrix</div>
-        <table style="font-size:0.8rem">
+        <div style="color:var(--text-dim);font-size:1rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Permission Matrix</div>
+        <table style="font-size:1.05rem">
           <thead>
             <tr style="border-bottom:1px solid var(--border-mid)">
               <th style="text-align:left;padding:7px 10px;color:var(--text-dim);font-weight:600;background:none;border:none">Role</th>
@@ -773,7 +1030,7 @@
             </tr>
             <tr style="border-bottom:1px solid var(--bg-mid)">
               <td style="padding:7px 10px;color:var(--text-1)">key-exporter</td>
-              <td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--yellow);font-size:0.75rem">⚠ approval</td><td style="text-align:center;color:var(--red)">✗</td>
+              <td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--red)">✗</td><td style="text-align:center;color:var(--yellow);font-size:0.9rem">⚠ approval</td><td style="text-align:center;color:var(--red)">✗</td>
             </tr>
             <tr>
               <td style="padding:7px 10px;color:var(--text-1)">key-destroyer</td>
@@ -781,7 +1038,7 @@
             </tr>
           </tbody>
         </table>
-        <div style="margin-top:12px;padding:9px 12px;border:1px solid var(--yellow);border-radius:var(--r-md);background:rgba(224,175,104,0.06);font-size:0.78rem;color:var(--yellow)">
+        <div style="margin-top:12px;padding:9px 12px;border:1px solid var(--yellow);border-radius:var(--r-md);background:rgba(224,175,104,0.06);font-size:0.95rem;color:var(--yellow)">
           ⚠ Export requires Control Group approval — no single person can do it alone
         </div>
       </div>
@@ -794,72 +1051,42 @@
     <div class="eyebrow" data-anim="fade-up">Control Groups</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">Dual Control — No Unilateral Action</h2>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:18px;align-items:start">
-      <div style="display:flex;flex-direction:column;gap:10px" data-anim="stagger">
+    <div style="display:flex;flex-direction:column;gap:18px;margin-top:18px" data-anim="stagger">
 
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <div style="min-width:24px;height:24px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">1</div>
-          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-            <strong style="color:var(--accent);font-size:0.86rem">Requestor calls export endpoint</strong>
-            <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px">Vault does not return the key. Returns a <strong style="color:var(--text-1)">wrapping token</strong> — request held pending approval.</p>
-          </div>
-        </div>
-
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <div style="min-width:24px;height:24px;border-radius:50%;background:var(--purple);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">2</div>
-          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-            <strong style="color:var(--purple);font-size:0.86rem">Requestor sends wrapping token to custodian</strong>
-            <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px">Out of band — email, Slack, ticket. Custodian reviews the request.</p>
-          </div>
-        </div>
-
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <div style="min-width:24px;height:24px;border-radius:50%;background:var(--yellow);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">3</div>
-          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-            <strong style="color:var(--yellow);font-size:0.86rem">Custodian authorises via Vault</strong>
-            <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px"><code>POST /v1/sys/control-group/authorize</code> — custodian identity recorded in audit log.</p>
-          </div>
-        </div>
-
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <div style="min-width:24px;height:24px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0">4</div>
-          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:9px 12px;flex:1">
-            <strong style="color:var(--green);font-size:0.86rem">Requestor unwraps — gets the key</strong>
-            <p style="color:var(--text-muted);font-size:0.78rem;margin-top:2px"><code>vault unwrap &lt;wrapping_token&gt;</code> — only succeeds after approval. Full audit trail.</p>
-          </div>
-        </div>
-
-        <div style="padding:9px 12px;border:1px solid var(--green);border-radius:var(--r-md);background:var(--green-dim);font-size:0.78rem;color:var(--green)">
-          ✓ <strong>Every export is a two-person event — enforced by Vault, recorded in audit log.</strong>
+      <div style="display:flex;align-items:flex-start;gap:16px">
+        <div style="min-width:36px;height:36px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0">1</div>
+        <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:14px 20px;flex:1">
+          <strong style="color:var(--accent);font-size:1.25rem">Requestor calls export endpoint</strong>
+          <p style="color:var(--text-muted);font-size:1.1rem;margin-top:4px">Vault does not return the key. Returns a <strong style="color:var(--text-1)">wrapping token</strong> — request held pending approval.</p>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:10px" data-anim="fade-in" style="animation-delay:.18s">
-        <div class="code-block" style="font-size:0.76rem">
-          <span class="comment"># Policy with control group</span><br>
-          path "transit/export/encryption-key/demo-key" {<br>
-          &nbsp;&nbsp;capabilities = ["read"]<br>
-          &nbsp;&nbsp;control_group = {<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;ttl = "1h"<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;factor "authorise" {<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;identity {<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;group_names = ["key-custodians"]<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;approvals   = 1<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-          &nbsp;&nbsp;}<br>
-          }<br>
+      <div style="display:flex;align-items:flex-start;gap:16px">
+        <div style="min-width:36px;height:36px;border-radius:50%;background:var(--purple);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0">2</div>
+        <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:14px 20px;flex:1">
+          <strong style="color:var(--purple);font-size:1.25rem">Requestor shares the wrap accessor with custodian</strong>
+          <p style="color:var(--text-muted);font-size:1.1rem;margin-top:4px">Out of band — email, Slack, ticket. Custodian receives the <em>accessor</em> (opaque reference), not the wrap token itself.</p>
         </div>
-        <div class="code-block" style="font-size:0.76rem">
-          <span class="comment"># Sentinel EGP — business hours only</span><br>
-          import "time"<br><br>
-          main = rule {<br>
-          &nbsp;&nbsp;time.now.hour >= 9 and<br>
-          &nbsp;&nbsp;time.now.hour &lt; 17<br>
-          }<br><br>
-          <span class="comment"># Applied to: transit/export/*</span><br>
-          <span class="comment"># Enforcement: hard-mandatory</span>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:16px">
+        <div style="min-width:36px;height:36px;border-radius:50%;background:var(--yellow);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0">3</div>
+        <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:14px 20px;flex:1">
+          <strong style="color:var(--yellow);font-size:1.25rem">Custodian authorises via Vault</strong>
+          <p style="color:var(--text-muted);font-size:1.1rem;margin-top:4px">Calls <code>sys/control-group/authorize</code> with the accessor — returns <code>{}</code> HTTP 200. Custodian identity recorded in audit log.</p>
         </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:16px">
+        <div style="min-width:36px;height:36px;border-radius:50%;background:var(--green);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0">4</div>
+        <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:14px 20px;flex:1">
+          <strong style="color:var(--green);font-size:1.25rem">Requestor collects key material</strong>
+          <p style="color:var(--text-muted);font-size:1.1rem;margin-top:4px">Unwraps the token (HTTP 204, approval consumed), then calls export to retrieve actual key material.</p>
+        </div>
+      </div>
+
+      <div style="padding:14px 20px;border:1px solid var(--green);border-radius:var(--r-md);background:var(--green-dim);font-size:1.1rem;color:var(--green)">
+        ✓ <strong>Every export is a two-person event — enforced by Vault, recorded in audit log.</strong>
       </div>
     </div>
     <div class="notes"><p>The wrapping token is the mechanism — the requestor gets a token, not the secret. It's only redeemable after approval. Both identities appear in the audit log — this is your 4-eyes compliance evidence.</p></div>
@@ -874,17 +1101,17 @@
       <div class="card">
         <h3>Encrypt Only</h3>
         <p>Application can submit plaintext and receive ciphertext.</p>
-        <br><p style="color:var(--text-dimmer);font-size:0.85rem">Cannot decrypt. Cannot manage keys.</p>
+        <br><p style="color:var(--text-dimmer);font-size:1rem">Cannot decrypt. Cannot manage keys.</p>
       </div>
       <div class="card">
         <h3>Decrypt Only</h3>
         <p>Authorised service can decrypt ciphertext to retrieve data.</p>
-        <br><p style="color:var(--text-dimmer);font-size:0.85rem">Cannot encrypt. Cannot manage keys.</p>
+        <br><p style="color:var(--text-dimmer);font-size:1rem">Cannot encrypt. Cannot manage keys.</p>
       </div>
       <div class="card card-accent">
         <h3>Key Admin</h3>
         <p>Security team can rotate and manage keys.</p>
-        <br><p style="color:var(--text-dimmer);font-size:0.85rem">Cannot encrypt or decrypt data.</p>
+        <br><p style="color:var(--text-dimmer);font-size:1rem">Cannot encrypt or decrypt data.</p>
       </div>
     </div>
     <div class="notes"><p>Separation of duties is enforced at the policy layer — not the application layer. The app team literally cannot get a token with decrypt rights. Strong compliance posture.</p></div>
@@ -922,16 +1149,16 @@
     </div>
     <div class="grid-2" data-anim="fade-in" style="animation-delay:.2s">
       <div>
-        <div style="margin-bottom:18px"><div class="badge">Step 1</div><h3>Encrypt sensitive data</h3><p>Submit a personnel record → receive ciphertext. The key never leaves the HSM.</p></div>
-        <div style="margin-bottom:18px"><div class="badge">Step 2</div><h3>Decrypt ciphertext</h3><p>Authorised role decrypts the data. Unauthorised role is denied.</p></div>
-        <div><div class="badge">Step 3</div><h3>Rotate the key</h3><p>Key rotated in Vault. Old ciphertext still decryptable. New encryptions use new version.</p></div>
+        <div style="margin-bottom:18px"><div class="badge">Section 1</div><h3>Encrypt existing database records</h3><p>Batch-encrypt a 5-row employee table with Vault Transform FPE. Format preserved, schema unchanged, deterministic search demonstrated.</p></div>
+        <div style="margin-bottom:18px"><div class="badge">Section 2</div><h3>Encrypt &amp; view records</h3><p>Add a new employee — TFN encrypted via Vault Transit before DB insert. Encrypted records table shows ciphertext; authorised role can decrypt inline.</p></div>
+        <div><div class="badge">Section 3</div><h3>Rotate the key</h3><p>Key rotated in Vault. Old ciphertext still decryptable. New encryptions use new version.</p></div>
       </div>
       <div>
-        <div style="margin-bottom:18px"><div class="badge">Step 4</div><h3>Separation of duties</h3><p>Encrypt-only token attempts decryption → permission denied.</p></div>
-        <div><div class="badge">Step 5</div><h3>Key governance</h3><p>Inspect key flags (exportable, deletion). Sentinel blocks export outside business hours. Control Group enforces dual approval. Deletion blocked by policy.</p></div>
+        <div style="margin-bottom:18px"><div class="badge">Section 4</div><h3>Separation of duties</h3><p>Encrypt-only token attempts decryption → permission denied.</p></div>
+        <div><div class="badge">Section 5</div><h3>Control Group — Dual Approval</h3><p><strong style="color:var(--accent)">Phase 1:</strong> Operator requests export → Vault intercepts, returns wrap_info (no key data).<br><strong style="color:var(--accent)">Phase 2:</strong> Custodian logs in and authorises — confirms <code>"approved": true</code>.<br><strong style="color:var(--accent)">Phase 3:</strong> Operator unwraps and collects key material.</p></div>
       </div>
     </div>
-    <div class="notes"><p>The table frames what the audience is about to watch — "this is vault-hsm standing in for real hardware, and here's how that maps to production." Then walk through the 5 steps. Step 4 (permission denied) is a crowd-pleaser.</p></div>
+    <div class="notes"><p>Walk through the 5 sections (1–5). Section 4 (permission denied) is a crowd-pleaser. Section 2 shows encrypt + decrypt in one card — add a record, then decrypt it from the table below.</p></div>
   </div>
 
   <!-- ⑮ Summary -->
@@ -946,7 +1173,7 @@
   <div class="slide slide-dark">
     <div class="eyebrow" data-anim="fade-up">Reference — ISM Controls</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">Mapping to ISM Controls</h2>
-    <table style="margin-top:6px;font-size:0.85rem" data-anim="fade-in" style="animation-delay:.12s">
+    <table style="margin-top:6px;font-size:1rem" data-anim="fade-in" style="animation-delay:.12s">
       <tr><th style="width:14%">ISM Control</th><th style="width:30%">Topic</th><th style="width:56%">How Vault Addresses It</th></tr>
       <tr><td style="color:var(--accent)">ISM-0507</td><td>Cryptographic Key Management</td><td>Vault Transit manages full key lifecycle — creation, rotation, versioning, retirement. <code>exportable=false</code>, <code>deletion_allowed=false</code>. Control Groups enforce dual authorisation.</td></tr>
       <tr><td style="color:var(--accent)">ISM-1080</td><td>Encrypting Data at Rest</td><td>Vault Transit uses ASD-Approved Cryptographic Algorithm (AES-256)</td></tr>

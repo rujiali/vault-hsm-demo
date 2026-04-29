@@ -65,6 +65,8 @@ services:
       - "5001:5000"
     environment:
       VAULT_ADDR: http://vault-main:8200
+    volumes:
+      - ./vault-main-init.json:/app/vault-main-init.json:ro
     networks:
       - vault-net
 

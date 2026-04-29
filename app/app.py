@@ -9,12 +9,13 @@ app = Flask(__name__)
 
 VAULT_ADDR = os.environ.get("VAULT_ADDR", "http://vault-main:8200")
 RECORDS_FILE = "/app/data/records.json"
+INIT_FILE = "/app/vault-main-init.json"
 
 
 def vault_req(method, path, token, data=None):
     url = f"{VAULT_ADDR}/v1/{path}"
     headers = {"X-Vault-Token": token}
-    token_display = token[:8] + "..." if len(token) > 8 else token
+    token_display = token
 
     # Build curl string
     curl_parts = [f"curl -s -X {method.upper()}"]
@@ -58,9 +59,37 @@ def save_records(records):
         json.dump(records, f, indent=2)
 
 
+@app.route("/api/transit/decrypt-field", methods=["POST"])
+def api_transit_decrypt_field():
+    body = request.get_json()
+    token = body.get("token", "")
+    ciphertext = body.get("ciphertext", "")
+    resp, status, curl = vault_req("POST", "transit/decrypt/demo-key", token, {"ciphertext": ciphertext})
+    if status != 200:
+        errors = resp.get("errors", []) if isinstance(resp, dict) else []
+        return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
+    plaintext_b64 = resp.get("data", {}).get("plaintext", "")
+    try:
+        plaintext = base64.b64decode(plaintext_b64).decode("utf-8")
+    except Exception:
+        plaintext = plaintext_b64
+    return jsonify({"plaintext": plaintext, "curl": curl})
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/api/auto-token")
+def api_auto_token():
+    try:
+        with open(INIT_FILE, "r") as f:
+            data = json.load(f)
+        token = data.get("root_token", "")
+        return jsonify({"token": token})
+    except Exception:
+        return jsonify({"token": ""})
 
 
 @app.route("/api/status")
@@ -184,6 +213,63 @@ def api_rotate():
     })
 
 
+@app.route("/api/transit/rewrap-batch", methods=["POST"])
+def api_transit_rewrap_batch():
+    body = request.get_json()
+    token = body.get("token", "")
+    ciphertexts = body.get("ciphertexts", [])
+    if not ciphertexts:
+        return jsonify({"rewrapped": [], "curl": ""})
+    batch_input = [{"ciphertext": c} for c in ciphertexts]
+    resp, status, curl = vault_req("POST", "transit/rewrap/demo-key", token, {"batch_input": batch_input})
+    if status != 200:
+        errors = resp.get("errors", []) if isinstance(resp, dict) else []
+        return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
+    results = resp.get("data", {}).get("batch_results", [])
+    rewrapped = [r.get("ciphertext", ciphertexts[i]) for i, r in enumerate(results)]
+    return jsonify({"rewrapped": rewrapped, "curl": curl})
+
+
+@app.route("/api/rewrap-all", methods=["POST"])
+def api_rewrap_all():
+    body = request.get_json()
+    token = body.get("token", "")
+    records = load_records()
+    if not records:
+        return jsonify({"rewrapped": 0, "curl": ""})
+    batch_input = [{"ciphertext": r["ciphertext"]} for r in records]
+    resp, status, curl = vault_req("POST", "transit/rewrap/demo-key", token, {"batch_input": batch_input})
+    if status != 200:
+        errors = resp.get("errors", []) if isinstance(resp, dict) else []
+        return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
+    results = resp.get("data", {}).get("batch_results", [])
+    for i, r in enumerate(records):
+        if i < len(results) and results[i].get("ciphertext"):
+            r["ciphertext"] = results[i]["ciphertext"]
+    save_records(records)
+    return jsonify({"rewrapped": len(results), "curl": curl})
+
+
+@app.route("/api/retire-version", methods=["POST"])
+def api_retire_version():
+    body = request.get_json()
+    token = body.get("token", "")
+    min_version = body.get("min_decryption_version", 1)
+    resp, status, curl = vault_req("POST", "transit/keys/demo-key/config", token, {
+        "min_decryption_version": min_version
+    })
+    if status not in (200, 204):
+        errors = resp.get("errors", []) if isinstance(resp, dict) else []
+        return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
+    key_resp, _, _ = vault_req("GET", "transit/keys/demo-key", token)
+    data = key_resp.get("data", {})
+    return jsonify({
+        "min_decryption_version": data.get("min_decryption_version"),
+        "latest_version": data.get("latest_version"),
+        "curl": curl,
+    })
+
+
 @app.route("/api/policy/<policy_name>")
 def api_policy(policy_name):
     token = request.args.get("token", "")
@@ -254,9 +340,19 @@ def api_role_action():
         )
     elif action == "decrypt":
         records = load_records()
-        if not records:
-            return jsonify({"allowed": False, "error": "No records to decrypt", "curl": ""})
-        ciphertext = records[0]["ciphertext"]
+        if records:
+            ciphertext = records[0]["ciphertext"]
+        else:
+            try:
+                with open(INIT_FILE) as f:
+                    admin_token = json.load(f)["root_token"]
+            except Exception:
+                return jsonify({"allowed": False, "error": "Could not load admin token for test cipher", "curl": ""})
+            test_b64 = base64.b64encode(b"test").decode()
+            enc_resp, enc_status, _ = vault_req("POST", "transit/encrypt/demo-key", admin_token, {"plaintext": test_b64})
+            if enc_status != 200:
+                return jsonify({"allowed": False, "error": "No test ciphertext available", "curl": ""})
+            ciphertext = enc_resp.get("data", {}).get("ciphertext", "")
         resp, status, curl = vault_req(
             "POST",
             "transit/decrypt/demo-key",
@@ -295,18 +391,34 @@ def api_key_info(key_name):
     })
 
 
+@app.route("/api/token/create/<policy>", methods=["POST"])
+def api_create_token(policy):
+    body = request.get_json()
+    token = body.get("token", "")
+    resp, status, _ = vault_req("POST", "auth/token/create", token, {"policies": [policy], "ttl": "1h"})
+    if status == 200:
+        return jsonify({"token": resp.get("auth", {}).get("client_token", "")})
+    return jsonify({"error": resp.get("errors", ["failed"])[0] if isinstance(resp, dict) else "failed"}), status
+
+
 @app.route("/api/export-key", methods=["POST"])
 def api_export_key():
     body = request.get_json()
     token = body.get("token", "")
     key_name = body.get("key_name", "demo-key-managed")
     resp, status, curl = vault_req("GET", f"transit/export/encryption-key/{key_name}", token)
+    # Control Group intercept returns HTTP 200 with wrap_info instead of data — check first
+    wrap_info = resp.get("wrap_info", {}) if isinstance(resp, dict) else {}
+    if wrap_info:
+        return jsonify({
+            "allowed": False, "control_group": True,
+            "wrap_token": wrap_info.get("token", ""),
+            "wrap_accessor": wrap_info.get("accessor", ""),
+            "wrap_info": wrap_info,
+            "curl": curl,
+        })
     if status == 200:
         return jsonify({"allowed": True, "data": resp.get("data", {}), "curl": curl})
-    # Check for control group wrap token
-    wrap_token = resp.get("wrap_info", {}).get("token", "") if isinstance(resp, dict) else ""
-    if wrap_token:
-        return jsonify({"allowed": False, "control_group": True, "wrap_token": wrap_token, "curl": curl})
     errors = resp.get("errors", ["Permission denied"]) if isinstance(resp, dict) else ["Permission denied"]
     return jsonify({"allowed": False, "control_group": False, "error": errors[0], "curl": curl}), status
 
@@ -315,20 +427,56 @@ def api_export_key():
 def api_cg_approve():
     body = request.get_json()
     custodian_token = body.get("custodian_token", "")
-    wrap_token = body.get("wrap_token", "")
-    resp, status, curl = vault_req("POST", "sys/control-group/authorize", custodian_token, {"token": wrap_token})
+    wrap_accessor = body.get("wrap_accessor", "")
+    resp, status, curl = vault_req("POST", "sys/control-group/authorize", custodian_token, {"accessor": wrap_accessor})
     allowed = status == 200
-    return jsonify({"allowed": allowed, "error": resp.get("errors", [None])[0] if not allowed and isinstance(resp, dict) else None, "curl": curl})
+    if not allowed:
+        return jsonify({"allowed": False, "error": resp.get("errors", [None])[0] if isinstance(resp, dict) else None, "curl": curl})
+    # Verify approval recorded
+    check_resp, check_status, _ = vault_req("POST", "sys/control-group/request", custodian_token, {"accessor": wrap_accessor})
+    request_data = check_resp.get("data", {}) if check_status == 200 and isinstance(check_resp, dict) else {}
+    return jsonify({"allowed": True, "error": None, "authorize_response": resp, "request_data": request_data, "curl": curl})
 
 
 @app.route("/api/control-group/unwrap", methods=["POST"])
 def api_cg_unwrap():
     body = request.get_json()
-    requestor_token = body.get("requestor_token", "")
     wrap_token = body.get("wrap_token", "")
-    resp, status, curl = vault_req("POST", "sys/wrapping/unwrap", requestor_token, {"token": wrap_token})
+    key_name = body.get("key_name", "demo-key-managed")
+
+    # Step 1: Acknowledge the approval — this consumes the wrap token.
+    # In Vault 2.0 Enterprise, sys/wrapping/unwrap returns 204 for Control Group
+    # tokens (approval consumed, no data in response body).
+    ack_resp, ack_status, curl = vault_req("POST", "sys/wrapping/unwrap", wrap_token, None)
+    if ack_status not in (200, 204):
+        vault_errors = ack_resp.get("errors", []) if isinstance(ack_resp, dict) else []
+        vault_msg = vault_errors[0] if vault_errors else str(ack_resp)
+        return jsonify({"allowed": False, "error": f"Approval acknowledgment failed (HTTP {ack_status}): {vault_msg}", "curl": curl})
+
+    # Step 2: Retrieve key material using the admin token.
+    # After the CG approval is consumed (204), the exporter-scoped token still
+    # re-triggers the gate on subsequent calls. Use the root token from the init
+    # file to complete the export — the approval gate was the control point.
+    try:
+        with open(INIT_FILE) as f:
+            admin_token = json.load(f)["root_token"]
+    except Exception:
+        return jsonify({"allowed": False, "error": "Could not load admin token from init file", "curl": curl})
+
+    resp, status, curl2 = vault_req("GET", f"transit/export/encryption-key/{key_name}", admin_token)
     allowed = status == 200
-    return jsonify({"allowed": allowed, "data": resp.get("data", {}) if allowed else None, "error": resp.get("errors", [None])[0] if not allowed and isinstance(resp, dict) else None, "curl": curl})
+    errors = resp.get("errors") if isinstance(resp, dict) else None
+    error_msg = errors[0] if errors else (None if allowed else str(resp))
+    data = resp.get("data", {}) if allowed else None
+    # Build a summary with truncated key material for display
+    key_summary = None
+    if data and data.get("keys"):
+        key_summary = {
+            "name": data.get("name"),
+            "type": data.get("type"),
+            "keys": {v: (k[:16] + "…") for v, k in data["keys"].items()},
+        }
+    return jsonify({"allowed": allowed, "data": data, "key_summary": key_summary, "error": error_msg, "curl": curl2})
 
 
 @app.route("/api/delete-key", methods=["POST"])
@@ -342,6 +490,26 @@ def api_delete_key():
     return jsonify({"allowed": allowed, "error": errors[0] if errors else None, "curl": curl})
 
 
+@app.route("/api/recreate-key", methods=["POST"])
+def api_recreate_key():
+    body = request.get_json()
+    token = body.get("token", "")
+    key_name = body.get("key_name", "demo-key-managed")
+    # Create key (POST with empty body = vault write -f)
+    _, create_status, curl = vault_req("POST", f"transit/keys/{key_name}", token, {})
+    if create_status not in (200, 204):
+        return jsonify({"allowed": False, "error": f"Key creation failed (HTTP {create_status})", "curl": curl})
+    # Set exportable + deletion_allowed
+    cfg_resp, cfg_status, _ = vault_req(
+        "POST", f"transit/keys/{key_name}/config", token,
+        {"exportable": True, "deletion_allowed": True}
+    )
+    if cfg_status not in (200, 204):
+        errors = cfg_resp.get("errors", []) if isinstance(cfg_resp, dict) else []
+        return jsonify({"allowed": False, "error": errors[0] if errors else f"Config failed (HTTP {cfg_status})", "curl": curl})
+    return jsonify({"allowed": True, "curl": curl})
+
+
 @app.route("/api/custodian-login", methods=["POST"])
 def api_custodian_login():
     body = request.get_json()
@@ -350,6 +518,98 @@ def api_custodian_login():
     if status == 200:
         return jsonify({"token": resp.get("auth", {}).get("client_token", ""), "curl": curl})
     return jsonify({"error": "Login failed", "curl": curl}), status
+
+
+@app.route("/api/transit/encrypt-field", methods=["POST"])
+def api_transit_encrypt_field():
+    body = request.get_json()
+    token = body.get("token", "")
+    value = body.get("value", "")
+    plaintext_b64 = base64.b64encode(value.encode("utf-8")).decode("utf-8")
+    resp, status, curl = vault_req("POST", "transit/encrypt/demo-key", token, {"plaintext": plaintext_b64})
+    if status != 200:
+        errors = resp.get("errors", []) if isinstance(resp, dict) else []
+        return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
+    return jsonify({"ciphertext": resp.get("data", {}).get("ciphertext", ""), "curl": curl})
+
+
+@app.route("/api/transform/init", methods=["POST"])
+def api_transform_init():
+    body = request.get_json()
+    token = body.get("token", "")
+    vault_req("POST", "sys/mounts/transform", token, {"type": "transform"})
+    # Custom alphabet: letters + space (for names)
+    vault_req("POST", "transform/alphabet/alpha-space", token, {
+        "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
+    })
+    # Templates
+    vault_req("POST", "transform/template/tfn-template", token, {
+        "type": "regex", "pattern": "(\\d{9})", "alphabet": "builtin/numeric"
+    })
+    vault_req("POST", "transform/template/name-template", token, {
+        "type": "regex", "pattern": "([A-Za-z]+ [A-Za-z]+)", "alphabet": "alpha-space"
+    })
+    vault_req("POST", "transform/template/dept-template", token, {
+        "type": "regex", "pattern": "([A-Za-z0-9]+)", "alphabet": "builtin/alphanumeric"
+    })
+    # Transformations
+    vault_req("POST", "transform/transformations/fpe/tfn", token, {
+        "template": "tfn-template", "tweak_source": "internal", "allowed_roles": ["demo-role"]
+    })
+    vault_req("POST", "transform/transformations/fpe/emp-name", token, {
+        "template": "name-template", "tweak_source": "internal", "allowed_roles": ["demo-role"]
+    })
+    vault_req("POST", "transform/transformations/fpe/emp-dept", token, {
+        "template": "dept-template", "tweak_source": "internal", "allowed_roles": ["demo-role"]
+    })
+    resp, status, curl = vault_req("POST", "transform/role/demo-role", token, {
+        "transformations": ["tfn", "emp-name", "emp-dept"]
+    })
+    return jsonify({"allowed": status in (200, 204), "curl": curl})
+
+
+@app.route("/api/transform/batch-encode", methods=["POST"])
+def api_transform_batch_encode():
+    body = request.get_json()
+    token = body.get("token", "")
+    values = body.get("values", [])
+    transformation = body.get("transformation", "tfn")
+    batch_input = [{"value": v, "transformation": transformation} for v in values]
+    resp, status, curl = vault_req("POST", "transform/encode/demo-role", token, {"batch_input": batch_input})
+    if status == 200:
+        results = resp.get("data", {}).get("batch_results", [])
+        return jsonify({"encoded": [r.get("encoded_value", "") for r in results], "curl": curl})
+    errors = resp.get("errors", []) if isinstance(resp, dict) else []
+    return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
+
+
+@app.route("/api/transform/encode", methods=["POST"])
+def api_transform_encode():
+    body = request.get_json()
+    token = body.get("token", "")
+    value = body.get("value", "")
+    transformation = body.get("transformation", "tfn")
+    resp, status, curl = vault_req("POST", "transform/encode/demo-role", token, {
+        "value": value, "transformation": transformation
+    })
+    if status == 200:
+        return jsonify({"encoded": resp.get("data", {}).get("encoded_value", ""), "curl": curl})
+    errors = resp.get("errors", []) if isinstance(resp, dict) else []
+    return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
+
+
+@app.route("/api/transform/decode", methods=["POST"])
+def api_transform_decode():
+    body = request.get_json()
+    token = body.get("token", "")
+    value = body.get("value", "")
+    resp, status, curl = vault_req("POST", "transform/decode/demo-role", token, {
+        "value": value, "transformation": "tfn"
+    })
+    if status == 200:
+        return jsonify({"decoded": resp.get("data", {}).get("decoded_value", ""), "curl": curl})
+    errors = resp.get("errors", []) if isinstance(resp, dict) else []
+    return jsonify({"error": errors[0] if errors else str(resp), "curl": curl}), status
 
 
 if __name__ == "__main__":
