@@ -1131,7 +1131,7 @@
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="card"><h3>👥 No Single Person Holds All the Power</h3><p>The team that encrypts data cannot decrypt it. The team that manages keys cannot read the data. Separation of duties enforced by policy, not trust.</p></div>
         <div class="card"><h3>🚀 Ready for Post-Quantum Requirements</h3><p>Australian government agencies must migrate to post-quantum cryptography by 2030. Vault's algorithm agility means you can migrate without re-architecting.</p></div>
-        <div class="card card-accent"><h3>📄 Aligned to Australian ISM</h3><p>Controls map directly to ISM requirements for cryptographic key management, data encryption, hardware key protection and post-quantum readiness.</p></div>
+        <div class="card card-accent"><h3>📄 Aligned to ISM Controls</h3><p>Controls map directly to ISM requirements for cryptographic key management, data encryption, hardware key protection and post-quantum readiness.</p></div>
       </div>
     </div>
     <div class="notes"><p>Frame for the CISO/risk audience. Lead with hardware protection and audit trail. The PQC point is a differentiator for Australian government — tie to the 2030 ISM mandate.</p></div>
@@ -1141,14 +1141,7 @@
   <div class="slide slide-accent">
     <div class="eyebrow" data-anim="fade-up">Demo</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">What You Will See</h2>
-    <div style="margin-bottom:18px" data-anim="fade-in" style="animation-delay:.1s">
-      <table>
-        <tr><th>Environment</th><th>Root of Trust</th><th>Mechanism</th></tr>
-        <tr><td>This Demo</td><td>vault-hsm (Vault KMIP engine)</td><td>PKCS#11 via libvault-pkcs11.so → KMIP</td></tr>
-        <tr><td>Production</td><td>Thales / Entrust / CloudHSM / AWS KMS</td><td>PKCS#11 / KMS</td></tr>
-      </table>
-    </div>
-    <div class="grid-2" data-anim="fade-in" style="animation-delay:.2s">
+    <div class="grid-2" data-anim="fade-in" style="animation-delay:.1s">
       <div>
         <div style="margin-bottom:18px"><div class="badge">Section 1</div><h3>Encrypt existing database records</h3><p>Batch-encrypt a 5-row employee table with Vault Transform FPE. Format preserved, schema unchanged, deterministic search demonstrated.</p></div>
         <div style="margin-bottom:18px"><div class="badge">Section 2</div><h3>Encrypt &amp; view records</h3><p>Add a new employee — TFN encrypted via Vault Transit before DB insert. Encrypted records table shows ciphertext; authorised role can decrypt inline.</p></div>
