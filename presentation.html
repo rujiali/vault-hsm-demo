@@ -510,7 +510,7 @@
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:14px">
       <div style="display:flex;flex-direction:column;gap:18px" data-anim="stagger">
-        <div class="card"><h3>Vault-Managed Keys (AES-256)</h3><p>Transit and FPE keys live in Vault's storage — but stored as <strong style="color:var(--accent)">ciphertext</strong>. Without the HSM, they are unreadable.</p></div>
+        <div class="card"><h3>Vault-Managed Keys</h3><p>Transit and FPE keys live in Vault's storage — but stored as <strong style="color:var(--accent)">ciphertext</strong>. Without the HSM, they are unreadable.</p></div>
         <div class="card card-accent"><h3>HSM Master Key</h3><p>Lives inside the HSM hardware — <strong style="color:var(--accent)">never exported</strong>. Used to wrap and unwrap all Vault-managed keys on demand.</p></div>
         <div class="card"><h3>The Result</h3><p>Even if someone steals Vault's storage, they get encrypted keys they cannot unwrap — the HSM is the only way to use them.</p></div>
       </div>
