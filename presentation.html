@@ -782,8 +782,8 @@
     <div class="notes"><p>FPE encrypts in-place — same column, same format, no schema change. The batch endpoint handles the whole table in one pass. For search: you never query for plaintext — encrypt the search term first via Vault, then run the WHERE clause on the encrypted column.</p></div>
   </div>
 
-  <!-- ⑨ HSM Integration -->
-  <div class="slide slide-accent">
+  <!-- ⑨ HSM Integration — hidden: covered in earlier slides -->
+  <div class="slide slide-accent" style="display:none">
     <div class="eyebrow" data-anim="fade-up">HSM Integration</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">Hardware Root of Trust</h2>
     <div class="grid-3" data-anim="stagger">
