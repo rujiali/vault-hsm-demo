@@ -721,36 +721,9 @@
     <div class="eyebrow" data-anim="fade-up">Existing Data</div>
     <h2 data-anim="fade-up" style="animation-delay:.06s">Encrypting an Existing Database</h2>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:14px;align-items:start">
+    <div style="display:grid;grid-template-columns:1fr;gap:36px;margin-top:14px;align-items:start;max-width:640px">
 
-      <div data-anim="stagger">
-        <h3 style="margin-bottom:14px">Migration — shadow column strategy</h3>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">1</div>
-            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
-              <strong style="color:var(--text-1)">Add encrypted column alongside original</strong>
-              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px"><code>ssn</code> → add <code>ssn_enc</code>. No schema breakage — old column still serves live traffic.</p>
-            </div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">2</div>
-            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
-              <strong style="color:var(--text-1)">Batch-encrypt existing rows via Vault</strong>
-              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Vault's bulk endpoint handles thousands of rows per call. No downtime required.</p>
-            </div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">3</div>
-            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
-              <strong style="color:var(--text-1)">Deploy app reading from encrypted column</strong>
-              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Dual-write during cutover — new writes go encrypted, old column is verified then dropped.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div data-anim="fade-in" style="animation-delay:.18s">
+      <div data-anim="fade-in">
         <h3 style="margin-bottom:14px">Search — encrypt the query term first</h3>
         <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:16px 20px">
           <div style="color:var(--text-dimmer);font-size:0.88rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px">FPE or tokenization — equality search</div>
@@ -779,7 +752,7 @@
         </div>
       </div>
     </div>
-    <div class="notes"><p>The shadow column approach is zero-downtime. The key insight for search: you never search for plaintext — you encrypt the search term first, then query. FPE is especially powerful here because the encrypted value is the same format, so existing DB indexes work without change.</p></div>
+    <div class="notes"><p>The key insight for search: you never search for plaintext — you encrypt the search term first, then query. FPE is especially powerful here because the encrypted value is the same format, so existing DB indexes work without change.</p></div>
   </div>
 
   <!-- ⑨ HSM Integration -->
