@@ -724,28 +724,23 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:14px;align-items:start">
 
       <div data-anim="stagger">
-        <h3 style="margin-bottom:14px">Encrypting an existing table — FPE in-place</h3>
+        <h3 style="margin-bottom:14px">Vault capabilities that enable bulk encryption</h3>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">1</div>
-            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
-              <strong style="color:var(--text-1)">Mount Transform engine, define FPE transformations</strong>
-              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">One transformation per sensitive column — each with its own alphabet and format pattern. No application code changes yet.</p>
-            </div>
+          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px">
+            <strong style="color:var(--accent)">Format-Preserving Encryption (FF3-1)</strong>
+            <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Encrypted values retain the original format — no schema change, no column rename, no index rebuild required.</p>
           </div>
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">2</div>
-            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
-              <strong style="color:var(--text-1)">Batch-encode all rows via Vault</strong>
-              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px"><code>transform/encode/role</code> accepts thousands of values per call. Entire table encrypted in one pass — no downtime.</p>
-            </div>
+          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px">
+            <strong style="color:var(--accent)">Batch encode API</strong>
+            <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px"><code>transform/encode/role</code> accepts thousands of values per call — entire table encrypted in a single API request.</p>
           </div>
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1b26;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0">3</div>
-            <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px;flex:1">
-              <strong style="color:var(--text-1)">Write encrypted values back to the same columns</strong>
-              <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Format is preserved — no schema change, no column rename, no index rebuild. Existing queries continue to work.</p>
-            </div>
+          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px">
+            <strong style="color:var(--accent)">Per-column transformations</strong>
+            <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Each sensitive column gets its own transformation with a dedicated alphabet and pattern — TFN, name, and department encrypted independently.</p>
+          </div>
+          <div style="background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 14px">
+            <strong style="color:var(--accent)">Deterministic output</strong>
+            <p style="color:var(--text-muted);font-size:0.95rem;margin-top:3px">Same input always produces the same ciphertext — existing DB equality indexes and search queries work unchanged.</p>
           </div>
         </div>
       </div>
