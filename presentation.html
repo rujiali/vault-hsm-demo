@@ -683,7 +683,7 @@
           <td>Same format as input — <code>4111-2345-6789-0123</code></td>
           <td style="color:var(--green)">No</td>
           <td style="color:var(--green)">✓ deterministic</td>
-          <td>SSN, card numbers, IDs — legacy schemas</td>
+          <td>Tax IDs, card numbers, national IDs — legacy schemas</td>
         </tr>
         <tr>
           <td style="color:var(--text-1);font-weight:600">Tokenization</td>
@@ -691,7 +691,7 @@
           <td>Random surrogate token — <code>tok_8f3kLp2q</code></td>
           <td style="color:var(--yellow)">Yes</td>
           <td style="color:var(--green)">✓ deterministic</td>
-          <td>PAN replacement, PCI compliance</td>
+          <td>Card number replacement, PCI compliance</td>
         </tr>
         <tr>
           <td style="color:var(--text-1);font-weight:600">Masking</td>
@@ -706,14 +706,14 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:18px" data-anim="fade-in" style="animation-delay:.2s">
       <div style="padding:14px 18px;background:var(--bg-mid);border:1px solid var(--border-mid);border-radius:var(--r-md)">
         <div style="color:var(--red);font-weight:700;font-size:1rem;margin-bottom:6px">Why Transit cannot be searched</div>
-        <p style="font-size:1rem">AES-GCM generates a fresh random IV for every encryption — the same SSN produces a different ciphertext every time. A DB index is useless.</p>
+        <p style="font-size:1rem">AES-GCM generates a fresh random IV for every encryption — the same value produces a different ciphertext every time. A DB index is useless.</p>
       </div>
       <div style="padding:14px 18px;background:var(--bg-mid);border:1px solid var(--green);border-radius:var(--r-md)">
         <div style="color:var(--green);font-weight:700;font-size:1rem;margin-bottom:6px">Why FPE &amp; tokenization can be searched</div>
         <p style="font-size:1rem">Both are deterministic — the same input always produces the same output for the same key. DB equality indexes work unchanged.</p>
       </div>
     </div>
-    <div class="notes"><p>Transit is for encrypting arbitrary data where you don't need to search. FPE is for structured sensitive fields where schema changes are undesirable. Tokenization is for PCI-style surrogate replacement. Masking is one-way — display only.</p></div>
+    <div class="notes"><p>Transit is for encrypting arbitrary data where you don't need to search. FPE is for structured sensitive fields where schema changes are undesirable. Tokenization is for card number or ID surrogate replacement. Masking is one-way — display only.</p></div>
   </div>
 
   <!-- ⑧ Searching Encrypted Data -->
@@ -757,15 +757,15 @@
 
           <div style="display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:10px">
-              <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;font-size:0.95rem;white-space:nowrap">User searches: <strong style="color:var(--text-1)">"123-45-6789"</strong></div>
+              <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;font-size:0.95rem;white-space:nowrap">User searches: <strong style="color:var(--text-1)">"123456789"</strong></div>
             </div>
             <div style="padding-left:8px;color:var(--text-dimmer);font-size:0.9rem">↓ app encrypts the search term via Vault</div>
             <div style="background:var(--bg-card-acc);border:1px solid var(--accent);border-radius:var(--r-sm);padding:7px 12px;font-size:0.95rem">
-              Vault FPE: <code style="color:var(--accent)">"123-45-6789"</code> → <code style="color:var(--accent)">"847-23-9156"</code> <span style="color:var(--text-dimmer);font-size:0.85rem">(always same)</span>
+              Vault FPE: <code style="color:var(--accent)">"123456789"</code> → <code style="color:var(--accent)">"847239156"</code> <span style="color:var(--text-dimmer);font-size:0.85rem">(always same)</span>
             </div>
             <div style="padding-left:8px;color:var(--text-dimmer);font-size:0.9rem">↓ query the encrypted column directly</div>
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;font-family:monospace;font-size:0.92rem">
-              SELECT * FROM users<br>WHERE ssn_enc = <span style="color:var(--accent)">'847-23-9156'</span>
+              SELECT * FROM employees<br>WHERE tfn_enc = <span style="color:var(--accent)">'847239156'</span>
             </div>
             <div style="padding-left:8px;color:var(--text-dimmer);font-size:0.9rem">↓ decrypt result to display</div>
             <div style="background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r-sm);padding:7px 12px;font-size:0.95rem;color:var(--green)">
